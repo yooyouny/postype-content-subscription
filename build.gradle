@@ -1,7 +1,8 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.7'
+	id 'org.springframework.boot' version '2.6.7'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "com.github.node-gradle.node" version "3.3.0"
 }
 
 group = 'com.postype'
