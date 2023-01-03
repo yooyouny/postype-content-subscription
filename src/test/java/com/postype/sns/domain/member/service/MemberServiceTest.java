@@ -33,7 +33,7 @@ public class MemberServiceTest {
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
-		when(memberRepository.save(any())).thenReturn(Optional.of(MemberFixture.get(memberId, password)));
+		when(memberRepository.save(any())).thenReturn(Optional.of(mock(Member.class)));
 
 		Assertions.assertDoesNotThrow(() -> memberService.register(memberId, password));
 	}
@@ -54,7 +54,7 @@ public class MemberServiceTest {
 	@Test
 	@DisplayName("로그인 성공 테스트")
 	void loginOk(){
-		String memberId = "memberId";
+		String memberId = "user";
 		String password = "password";
 
 		//mocking member 객체로 하기
