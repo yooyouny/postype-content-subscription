@@ -38,7 +38,7 @@ public class MemberControllerTest {
 	@Test
 	@DisplayName("회원 가입 성공 테스트")
 	@WithAnonymousUser
-	public void registerOk() throws Exception {
+	public void registerSuccess() throws Exception {
 		String memberId = "memberId";
 		String password = "password";
 
@@ -53,7 +53,7 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("회원 가입 실패 테스트 - 이미 가입된 memberId로 시도 하는 경우 에러 반환")
-	public void registerFailCausedByDuplicated() throws Exception {
+	public void registerFailCausedByDuplicatedId() throws Exception {
 		String memberId = "memberId";
 		String password = "password";
 
@@ -70,7 +70,7 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 성공 테스트")
-	public void loginOk() throws Exception {
+	public void loginSuccess() throws Exception {
 		String memberId = "memberId";
 		String password = "password";
 
@@ -85,7 +85,7 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 실패 테스트 - memberId를 찾지 못함")
-	public void loginFailCausedById() throws Exception {
+	public void loginFailCausedByNotFoundedId() throws Exception {
 		String memberId = "name";
 		String password = "password";
 
@@ -101,7 +101,7 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 실패 테스트 - 잘못된 password 입력")
-	public void loginFailCausedByPassword() throws Exception {
+	public void loginFailCausedByWrongPassword() throws Exception {
 		String memberId = "name";
 		String password = "password";
 

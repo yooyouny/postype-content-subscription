@@ -1,6 +1,7 @@
-package com.postype.sns.domain.member.model.entity;
+package com.postype.sns.domain.post.model;
 
 import com.postype.sns.domain.member.model.MemberRole;
+import com.postype.sns.domain.member.model.entity.Member;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
@@ -10,6 +11,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -20,25 +23,24 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Table
+@Table(name = "\"post\"")
 @Getter
 @Setter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATED member SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATED post SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Member {
+public class Post {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name = "member_id")
-	private String memberId;
-	private String password;
-	@Column(name = "member_name")
-	private String memberName;
-	private String email;
-	@Column(name = "role")
-	@Enumerated(EnumType.STRING)
-	private MemberRole role = MemberRole.USER;
+	private String title;
+	@Column(columnDefinition = "TEXT")
+	private String body;
+	@ManyToOne
+	@JoinColumn(name= "member_id", insertable = false, updatable = false)
+	private Member member;
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -55,12 +57,14 @@ public class Member {
 	void updatedAt() {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
-	//새 멤버 엔티티를 만들어 주는 메소드
-	public static Member of(String memberId, String password){
-		Member member = new Member();
-		member.setMemberId(memberId);
-		member.setPassword(password);
-		return member;
+
+	public static Post of(String title, String body, Member member){
+		Post post = new Post();
+		post.setTitle(title);
+		post.setBody(body);
+		post.setMember(member);
+		return post;
 	}
+
 
 }

@@ -24,6 +24,10 @@ public class MemberService {
 	@Value("${jwt.token.expired-time-ms}")
 	private Long expiredTimeMs;
 
+	public MemberRequestDto loadMemberByMemberId(String memberId){
+		return memberRepository.findByMemberId(memberId).map(MemberRequestDto::fromMember).orElseThrow(() ->
+			new MemberException(ErrorCode.MEMBER_NOT_FOUND, String.format(" %s is not founded", memberId)));
+	}
 	@Transactional
 	public MemberRequestDto register(String memberId, String password) {
 
