@@ -18,13 +18,11 @@ public class PostService{
 	private final MemberRepository memberRepository;
 	@Transactional
 	public void create(String title, String body, String memberId){
-
 		//user find
 		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
 			new MemberException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 		//post save
-		Post savedPost = postRepository.save(Post.of(title, body, foundedMember));
-
+		postRepository.save(Post.of(title, body, foundedMember));
 	}
 
 }

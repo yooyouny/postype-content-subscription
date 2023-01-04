@@ -1,5 +1,6 @@
 package com.postype.sns.configuration;
 
+import com.postype.sns.application.exception.CustomAuthenticationEntryPoint;
 import com.postype.sns.configuration.filter.JwtTokenFilter;
 import com.postype.sns.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.addFilterBefore(new JwtTokenFilter(key, memberService), UsernamePasswordAuthenticationFilter.class)
-			;
+			.exceptionHandling()
+			.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+		;
 	}
 }

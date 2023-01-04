@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PostController {
 
-	private PostService postService;
+	private final PostService postService;
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
 		postService.create(request.getTitle(), request.getBody(), authentication.getName());
-		return Response.success(null);
+		return Response.success();
 	}
 
 }

@@ -39,7 +39,7 @@ public class Post {
 	@Column(columnDefinition = "TEXT")
 	private String body;
 	@ManyToOne
-	@JoinColumn(name= "member_id", insertable = false, updatable = false)
+	@JoinColumn(name= "member_id")
 	private Member member;
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
