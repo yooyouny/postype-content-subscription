@@ -1,5 +1,6 @@
 package com.postype.sns.configuration;
 
+import com.postype.sns.application.exception.CustomAuthenticationEntryPoint;
 import com.postype.sns.configuration.filter.JwtTokenFilter;
 import com.postype.sns.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,15 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()
 			.authorizeRequests()
-			.antMatchers("/api/*/members/register", "api/*/members/login").permitAll()
+			.antMatchers("/api/*/members/register", "/api/*/members/login").permitAll()
 			.antMatchers("/api/**").authenticated()
 			.and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.addFilterBefore(new JwtTokenFilter(key, memberService), UsernamePasswordAuthenticationFilter.class)
-			;
+			.exceptionHandling()
+			.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+		;
 	}
 }
