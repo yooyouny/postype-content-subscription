@@ -2,13 +2,19 @@ package com.postype.sns.domain.member.model;
 
 import com.postype.sns.domain.member.model.entity.Member;
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-@Data
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class MemberRequestDto{
+public class MemberRequestDto implements UserDetails {
 	private Long id;
 	private String memberId;
 	private String password;
@@ -31,4 +37,33 @@ public class MemberRequestDto{
 		);
 	}
 
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(this.getRole().toString()));
+	}
+
+	@Override
+	public String getUsername() {
+		return this.getMemberId();
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return this.deletedAt == null;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return this.deletedAt == null;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return this.deletedAt == null;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return this.deletedAt == null;
+	}
 }
