@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.MemberException;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootTest
 public class MemberServiceTest {
@@ -25,6 +27,9 @@ public class MemberServiceTest {
 	@MockBean
 	private MemberRepository memberRepository;
 
+	@MockBean
+	private BCryptPasswordEncoder encoder;
+
 	@Test
 	@DisplayName("회원가입 성공 테스트")
 	void registerOk(){
@@ -33,7 +38,8 @@ public class MemberServiceTest {
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
-		when(memberRepository.save(any())).thenReturn(Optional.of(mock(Member.class)));
+		when(encoder.encode(password)).thenReturn("encrypt password");
+		when(memberRepository.save(any())).thenReturn(MemberFixture.get(memberId,password));
 
 		Assertions.assertDoesNotThrow(() -> memberService.register(memberId, password));
 	}
@@ -47,21 +53,23 @@ public class MemberServiceTest {
 		Member fixture = MemberFixture.get(memberId, password);
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
+		when(encoder.encode(password)).thenReturn("encrypt password");
 		when(memberRepository.save(any())).thenReturn(Optional.of(fixture));
-		Assertions.assertThrows(MemberException.class, () -> memberService.register(memberId, password));
+	 	MemberException e =	Assertions.assertThrows(MemberException.class, () -> memberService.register(memberId, password));
+		 Assertions.assertEquals(ErrorCode.DUPLICATED_MEMBER_NAME, e.getErrorCode());
 	}
 
 	@Test
 	@DisplayName("로그인 성공 테스트")
 	void loginOk(){
-		String memberId = "user";
+		String memberId = "memberId";
 		String password = "password";
 
-		//mocking member 객체로 하기
-		//when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.classs)));
-
-		//mocking fixture 사용
 		Member fixture = MemberFixture.get(memberId, password);
+		//mocking member 객체로 하기 when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.classs)));
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
+		when(encoder.matches(password, fixture.getPassword())).thenReturn(true);
+
 		Assertions.assertDoesNotThrow(() -> memberService.login(memberId, password));
 	}
 
@@ -74,7 +82,8 @@ public class MemberServiceTest {
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
 
-		Assertions.assertThrows(MemberException.class, () -> memberService.login(memberId, password));
+		MemberException e = Assertions.assertThrows(MemberException.class, () -> memberService.login(memberId, password));
+		Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND, e.getErrorCode());
 	}
 
 	@Test
@@ -88,6 +97,7 @@ public class MemberServiceTest {
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
 
 
-		Assertions.assertThrows(MemberException.class, () -> memberService.login(memberId, wrongPassword));
+		MemberException e = Assertions.assertThrows(MemberException.class, () -> memberService.login(memberId, wrongPassword));
+		Assertions.assertEquals(ErrorCode.INVALID_PASSWORD, e.getErrorCode());
 	}
 }

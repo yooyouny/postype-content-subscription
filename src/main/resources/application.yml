@@ -15,3 +15,7 @@ spring.datasource:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+jwt:
+  secret-key: posType.sns-application-2023.secret_key
+  # 30days
+  token.expired-time-ms: 2592000000

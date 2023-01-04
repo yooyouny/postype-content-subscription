@@ -36,7 +36,7 @@ public class MemberControllerTest {
 	@MockBean
 	private MemberService memberService;
 	@Test
-	@DisplayName("회원가입 성공 테스트")
+	@DisplayName("회원 가입 성공 테스트")
 	@WithAnonymousUser
 	public void registerOk() throws Exception {
 		String memberId = "memberId";
@@ -52,12 +52,12 @@ public class MemberControllerTest {
 	}
 
 	@Test
-	@DisplayName("회원가입 실패 테스트 - 이미 가입된 memberId으로 시도하는 경우 에러반환")
+	@DisplayName("회원 가입 실패 테스트 - 이미 가입된 memberId로 시도 하는 경우 에러 반환")
 	public void registerFailCausedByDuplicated() throws Exception {
 		String memberId = "memberId";
 		String password = "password";
 
-		when(memberService.register(memberId, password)).thenThrow(new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME, ""));
+		when(memberService.register(memberId, password)).thenThrow(new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -85,34 +85,34 @@ public class MemberControllerTest {
 	}
 
 	@Test
-	@DisplayName("로그인 실패 테스트 - 아이디를 찾지 못함")
+	@DisplayName("로그인 실패 테스트 - memberId를 찾지 못함")
 	public void loginFailCausedById() throws Exception {
-		String memberId = "memberId";
+		String memberId = "name";
 		String password = "password";
 
-		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME, ""));
+		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				// TODO : add request body
-				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest(memberId, password)))
+				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest("name", "password")))
 			).andDo(print())
-			.andExpect(status().isNotFound());
+			.andExpect(status().is(ErrorCode.MEMBER_NOT_FOUND.getStatus().value()));
 	}
 
 	@Test
-	@DisplayName("로그인 실패 테스트 - 잘못된 패스워드 입력")
+	@DisplayName("로그인 실패 테스트 - 잘못된 password 입력")
 	public void loginFailCausedByPassword() throws Exception {
-		String memberId = "memberId";
+		String memberId = "name";
 		String password = "password";
 
-		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME, ""));
+		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.INVALID_PASSWORD));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				// TODO : add request body
 				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest(memberId, password)))
 			).andDo(print())
-			.andExpect(status().isUnauthorized());
+			.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus().value()));
 	}
 }
