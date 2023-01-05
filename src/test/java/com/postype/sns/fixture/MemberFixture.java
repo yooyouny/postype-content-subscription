@@ -1,4 +1,4 @@
-package com.postype.sns.util;
+package com.postype.sns.fixture;
 
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.model.MemberRole;
@@ -7,9 +7,9 @@ import java.time.Instant;
 
 public class MemberFixture {
 //테스트용으로 만든 Member Entity
-	public static Member get(String memberId, String password){
+	public static Member get(String memberId, String password, Long Id){
 		Member member = new Member();
-			member.setId(2L);
+			member.setId(Id);
 			member.setMemberId(memberId);
 			member.setPassword(password);
 			member.setRole(MemberRole.USER);

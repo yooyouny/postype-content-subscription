@@ -1,10 +1,11 @@
 package com.postype.sns.domain.post.service;
 
 import com.postype.sns.application.exception.ErrorCode;
-import com.postype.sns.application.exception.MemberException;
+import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.model.PostRequestDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,31 @@ public class PostService{
 	public void create(String title, String body, String memberId){
 		//user find
 		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new MemberException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 		//post save
 		postRepository.save(Post.of(title, body, foundedMember));
+	}
+
+	@Transactional
+	public PostRequestDto modify(String title, String body, String memberId, Long postId){
+		//user find
+		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+
+		//post exist
+		Post post = postRepository.findById(postId).orElseThrow(() ->
+			 new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+		//post permission
+
+		if(post.getMember() != foundedMember){
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
+		}
+
+		post.setTitle(title);
+		post.setBody(body);
+		return PostRequestDto.fromPost(postRepository.saveAndFlush(post));
+
+
 	}
 
 }
