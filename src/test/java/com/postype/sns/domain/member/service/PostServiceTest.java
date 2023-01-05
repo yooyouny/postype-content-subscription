@@ -101,7 +101,7 @@ public class PostServiceTest {
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 	@Test
-	@DisplayName("포스트 수정 시 포스트가 존재하지 않는 경우 실패 테스트")
+	@DisplayName("포스트 수정 시 포스트가 존재 하지 않는 경우 실패 테스트")
 	void postModifyFailCausedByNotFoundedPost(){
 		String title = "title";
 		String body = "body";
@@ -117,6 +117,59 @@ public class PostServiceTest {
 
 		ApplicationException e = Assertions.assertThrows(
 			ApplicationException.class, () -> postService.modify(title, body, memberId, postId));
+		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+	}
+
+	@Test
+	@DisplayName("포스트 수정 성공 테스트")
+	void PostDeleteSuccess(){
+		String memberId = "memberId";
+		Long postId = 1L;
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+
+		Assertions.assertDoesNotThrow(() -> postService.delete(memberId, 1L));
+	}
+	@Test
+	@DisplayName("포스트 수정 시 권한이 없는 경우 실패 테스트")
+	void postDeleteFailCausedByNotLoginMember(){
+		String title = "title";
+		String body = "body";
+		String memberId = "memberId";
+		Long postId = 1L;
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member writer = MemberFixture.get("memberId", "password", 2L);
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(writer));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		ApplicationException e = Assertions.assertThrows(
+			ApplicationException.class, () -> postService.delete(memberId, 1L));
+		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
+	}
+	@Test
+	@DisplayName("포스트 수정 시 포스트가 존재 하지 않는 경우 실패 테스트")
+	void postDeleteFailCausedByNotFoundedPost(){
+		String memberId = "memberId";
+		Long postId = 1L;
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+		ApplicationException e = Assertions.assertThrows(
+			ApplicationException.class, () -> postService.delete(memberId, 1L));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 

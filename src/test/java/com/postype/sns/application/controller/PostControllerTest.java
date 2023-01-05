@@ -166,13 +166,27 @@ public class PostControllerTest {
 
 	@Test
 	@WithMockUser //인증 된 유저
-	@DisplayName("포스트 삭제 성공 테스트")
-	void postDeleteSuccess() throws java.lang.Exception {
+	@DisplayName("포스트 삭제 시 작성자와 삭제요청자가 다를 경우 실패 테스트")
+	void postDeleteFailCausedByNotMatchedMember() throws java.lang.Exception {
+		//mocking
+		doThrow(new ApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(any(), any());
 
 		mockMvc.perform(delete("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
-			.andExpect(status().isOk());
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("포스트 삭제 시 포스트가 존재하지 않는 경우 실패 테스트")
+	void postDeleteFailCausedByNotFoundedPost() throws java.lang.Exception {
+
+		doThrow(new ApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(any(), any());
+		mockMvc.perform(delete("/api/v1/posts/1")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isNotFound());
 	}
 
 

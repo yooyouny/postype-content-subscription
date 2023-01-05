@@ -35,8 +35,8 @@ public class PostService{
 		//post exist
 		Post post = postRepository.findById(postId).orElseThrow(() ->
 			 new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
-		//post permission
 
+		//post permission
 		if(post.getMember() != foundedMember){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
 		}
@@ -44,8 +44,21 @@ public class PostService{
 		post.setTitle(title);
 		post.setBody(body);
 		return PostRequestDto.fromPost(postRepository.saveAndFlush(post));
+	}
+	@Transactional
+	public void delete(String memberId, Long postId){
+		//user find
+		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 
+		Post post = postRepository.findById(postId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
 
+		if(post.getMember() != foundedMember){
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
+		}
+
+		postRepository.delete(post);
 	}
 
 }
