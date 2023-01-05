@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postype.sns.application.contoller.dto.request.MemberLoginRequest;
 import com.postype.sns.application.contoller.dto.request.MemberRegisterRequest;
 import com.postype.sns.application.exception.ErrorCode;
-import com.postype.sns.application.exception.MemberException;
+import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.member.model.MemberRequestDto;
 import com.postype.sns.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ public class MemberControllerTest {
 	@Test
 	@DisplayName("회원 가입 성공 테스트")
 	@WithAnonymousUser
-	public void registerSuccess() throws Exception {
+	public void registerSuccess() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
 
@@ -53,11 +53,11 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("회원 가입 실패 테스트 - 이미 가입된 memberId로 시도 하는 경우 에러 반환")
-	public void registerFailCausedByDuplicatedId() throws Exception {
+	public void registerFailCausedByDuplicatedId() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
 
-		when(memberService.register(memberId, password)).thenThrow(new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME));
+		when(memberService.register(memberId, password)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_NAME));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +70,7 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 성공 테스트")
-	public void loginSuccess() throws Exception {
+	public void loginSuccess() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
 
@@ -86,11 +86,11 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 실패 테스트 - memberId를 찾지 못함")
-	public void loginFailCausedByNotFoundedId() throws Exception {
+	public void loginFailCausedByNotFoundedId() throws java.lang.Exception {
 		String memberId = "name";
 		String password = "password";
 
-		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+		when(memberService.login(memberId, password)).thenThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -102,11 +102,11 @@ public class MemberControllerTest {
 
 	@Test
 	@DisplayName("로그인 실패 테스트 - 잘못된 password 입력")
-	public void loginFailCausedByWrongPassword() throws Exception {
+	public void loginFailCausedByWrongPassword() throws java.lang.Exception {
 		String memberId = "name";
 		String password = "password";
 
-		when(memberService.login(memberId, password)).thenThrow(new MemberException(ErrorCode.INVALID_PASSWORD));
+		when(memberService.login(memberId, password)).thenThrow(new ApplicationException(ErrorCode.INVALID_PASSWORD));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
