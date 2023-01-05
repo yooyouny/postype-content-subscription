@@ -1,6 +1,6 @@
 package com.postype.sns.application.contoller.dto.response;
 
-import com.postype.sns.domain.member.model.MemberRequestDto;
+import com.postype.sns.domain.member.model.MemberDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ public class MemberResponse {
 	private Long id;
 	private String userName;
 
-	public static MemberResponse fromMember(MemberRequestDto member) {
+	public static MemberResponse fromMemberDto(MemberDto member) {
 		return new MemberResponse(
 				member.getId(),
 				member.getMemberId()

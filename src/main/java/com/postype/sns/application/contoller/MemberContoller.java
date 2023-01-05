@@ -19,17 +19,16 @@ public class MemberContoller {
 
 	private final MemberService memberService;
 
-	//TODO :: implement
 	@PostMapping("/register")
 	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
 		return Response.success(
-			MemberRegisterResponse.fromMember(memberService.register(request.getMemberId(), request.getPassword())));
+			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword())));
 	}
 
 	@PostMapping("/login")
 	public Response<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
 		String token = memberService.login(request.getMemberId(), request.getPassword());
-		return Response.success(new MemberLoginResponse(token));
+		return Response.success(new MemberLoginResponse(token)); //dto <-> response 변환이 아닌 token값 반환
 	}
 
 }

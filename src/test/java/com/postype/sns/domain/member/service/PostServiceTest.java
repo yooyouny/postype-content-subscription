@@ -82,7 +82,7 @@ public class PostServiceTest {
 		Assertions.assertDoesNotThrow(() -> postService.modify(title, body, memberId, postId));
 	}
 	@Test
-	@DisplayName("포스트 수정 시 권한이 없는 경우 실패 테스트")
+	@DisplayName("포스트 수정 시 작성자와 수정자가 다를 경우 실패 테스트")
 	void postModifyFailCausedByNotLoginMember(){
 		String title = "title";
 		String body = "body";
@@ -90,7 +90,7 @@ public class PostServiceTest {
 		Long postId = 1L;
 
 		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
+		Post post = PostFixture.get(memberId, postId, 1L); //memberId, postId, member sequence id
 		Member writer = MemberFixture.get("memberId", "password", 2L);
 
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(writer));
@@ -112,7 +112,7 @@ public class PostServiceTest {
 		Post post = PostFixture.get(memberId, postId, 1L);
 		Member member = post.getMember();
 
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member)); //포스트에 등록된 작성자와 멤버가 동일함을 명시
 		when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
@@ -121,7 +121,7 @@ public class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("포스트 수정 성공 테스트")
+	@DisplayName("포스트 삭제 성공 테스트")
 	void PostDeleteSuccess(){
 		String memberId = "memberId";
 		Long postId = 1L;
@@ -137,7 +137,7 @@ public class PostServiceTest {
 		Assertions.assertDoesNotThrow(() -> postService.delete(memberId, 1L));
 	}
 	@Test
-	@DisplayName("포스트 수정 시 권한이 없는 경우 실패 테스트")
+	@DisplayName("포스트 삭제 시 권한이 없는 경우 실패 테스트")
 	void postDeleteFailCausedByNotLoginMember(){
 		String title = "title";
 		String body = "body";
@@ -156,7 +156,7 @@ public class PostServiceTest {
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 	@Test
-	@DisplayName("포스트 수정 시 포스트가 존재 하지 않는 경우 실패 테스트")
+	@DisplayName("포스트 삭제 시 포스트가 존재 하지 않는 경우 실패 테스트")
 	void postDeleteFailCausedByNotFoundedPost(){
 		String memberId = "memberId";
 		Long postId = 1L;

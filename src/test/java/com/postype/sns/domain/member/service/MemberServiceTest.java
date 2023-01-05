@@ -55,9 +55,10 @@ public class MemberServiceTest {
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
 		when(encoder.encode(password)).thenReturn("encrypt password");
 		when(memberRepository.save(any())).thenReturn(Optional.of(fixture));
+
 	 	ApplicationException e =	Assertions.assertThrows(
 			ApplicationException.class, () -> memberService.register(memberId, password));
-		 Assertions.assertEquals(ErrorCode.DUPLICATED_MEMBER_NAME, e.getErrorCode());
+		 Assertions.assertEquals(ErrorCode.DUPLICATED_MEMBER_ID, e.getErrorCode());
 	}
 
 	@Test
