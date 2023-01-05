@@ -24,7 +24,7 @@ import org.hibernate.annotations.Where;
 @Getter
 @Setter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATED member SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
 public class Member {
 
