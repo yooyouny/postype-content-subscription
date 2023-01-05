@@ -30,7 +30,7 @@ public class PostController {
 	}
 
 	@PutMapping("/{postId}")
-	public Response<PostResponse> create(@PathVariable Long postId, @RequestBody PostModifyRequest request, Authentication authentication){
+	public Response<PostResponse> modify(@PathVariable Long postId, @RequestBody PostModifyRequest request, Authentication authentication){
 		PostRequestDto post = postService.modify(request.getTitle(), request.getBody(), authentication.getName(), postId);
 		return Response.success(PostResponse.fromPost(post));
 	}
