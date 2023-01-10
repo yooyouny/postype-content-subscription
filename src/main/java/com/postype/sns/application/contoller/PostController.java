@@ -4,7 +4,7 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
-import com.postype.sns.domain.post.model.PostRequestDto;
+import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -31,8 +31,8 @@ public class PostController {
 
 	@PutMapping("/{postId}")
 	public Response<PostResponse> modify(@PathVariable Long postId, @RequestBody PostModifyRequest request, Authentication authentication){
-		PostRequestDto post = postService.modify(request.getTitle(), request.getBody(), authentication.getName(), postId);
-		return Response.success(PostResponse.fromPost(post));
+		PostDto post = postService.modify(request.getTitle(), request.getBody(), authentication.getName(), postId);
+		return Response.success(PostResponse.fromPostDto(post));
 	}
 
 	@DeleteMapping("/{postId}")

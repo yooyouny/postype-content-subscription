@@ -5,16 +5,14 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @AllArgsConstructor
-public class MemberRequestDto implements UserDetails {
+public class MemberDto implements UserDetails {
 	private Long id;
 	private String memberId;
 	private String password;
@@ -24,8 +22,8 @@ public class MemberRequestDto implements UserDetails {
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
 
-	public static MemberRequestDto fromMember(Member member){
-		return new MemberRequestDto(
+	public static MemberDto fromMember(Member member){
+		return new MemberDto(
 			member.getId(),
 			member.getMemberId(),
 			member.getPassword(),

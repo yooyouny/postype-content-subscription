@@ -1,10 +1,9 @@
 package com.postype.sns.configuration.filter;
 
-import com.postype.sns.domain.member.model.MemberRequestDto;
+import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.utill.JwtTokenUtils;
 import java.io.IOException;
-import java.util.List;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -48,7 +46,7 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 			}
 
 			String memberId = JwtTokenUtils.getMemberId(token, key);
-			MemberRequestDto member = memberService.loadMemberByMemberId(memberId);
+			MemberDto member = memberService.loadMemberByMemberId(memberId);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				member, null, member.getAuthorities()

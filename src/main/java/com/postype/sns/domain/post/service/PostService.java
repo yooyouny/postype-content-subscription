@@ -5,7 +5,7 @@ import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.domain.post.model.PostRequestDto;
+import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class PostService{
 	}
 
 	@Transactional
-	public PostRequestDto modify(String title, String body, String memberId, Long postId){
+	public PostDto modify(String title, String body, String memberId, Long postId){
 		//user find
 		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
@@ -43,7 +43,7 @@ public class PostService{
 
 		post.setTitle(title);
 		post.setBody(body);
-		return PostRequestDto.fromPost(postRepository.saveAndFlush(post));
+		return PostDto.fromPost(postRepository.saveAndFlush(post));
 	}
 	@Transactional
 	public void delete(String memberId, Long postId){

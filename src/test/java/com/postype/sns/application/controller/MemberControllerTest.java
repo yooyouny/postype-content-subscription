@@ -11,7 +11,7 @@ import com.postype.sns.application.contoller.dto.request.MemberLoginRequest;
 import com.postype.sns.application.contoller.dto.request.MemberRegisterRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.member.model.MemberRequestDto;
+import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ public class MemberControllerTest {
 		String memberId = "memberId";
 		String password = "password";
 
-		when(memberService.register(memberId, password)).thenReturn(mock(MemberRequestDto.class));
+		when(memberService.register(memberId, password)).thenReturn(mock(MemberDto.class));
 
 		mockMvc.perform(post("/api/v1/members/register")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +57,7 @@ public class MemberControllerTest {
 		String memberId = "memberId";
 		String password = "password";
 
-		when(memberService.register(memberId, password)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_NAME));
+		when(memberService.register(memberId, password)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)

@@ -16,7 +16,7 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.post.model.PostRequestDto;
+import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.fixture.PostFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -83,7 +83,7 @@ public class PostControllerTest {
 		String body = "body";
 
 		when(postService.modify(eq(title), eq(body), any(), any()))
-			.thenReturn(PostRequestDto.fromPost(PostFixture.get("memberId", 1L, 1L)));
+			.thenReturn(PostDto.fromPost(PostFixture.get("memberId", 1L, 1L)));
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
