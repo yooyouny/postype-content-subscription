@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberRegisterRequest{
-
-	private String memberId;
-	private String password;
+public class PostCreateRequest {
+	private String title;
+	private String body;
 }

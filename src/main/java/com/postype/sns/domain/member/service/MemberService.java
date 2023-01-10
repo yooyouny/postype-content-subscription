@@ -1,8 +1,8 @@
 package com.postype.sns.domain.member.service;
 
 import com.postype.sns.application.exception.ErrorCode;
-import com.postype.sns.application.exception.MemberException;
-import com.postype.sns.domain.member.model.MemberRequestDto;
+import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.utill.JwtTokenUtils;
@@ -24,25 +24,29 @@ public class MemberService {
 	@Value("${jwt.token.expired-time-ms}")
 	private Long expiredTimeMs;
 
+	public MemberDto loadMemberByMemberId(String memberId){
+		return memberRepository.findByMemberId(memberId).map(MemberDto::fromMember).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format(" %s is not founded", memberId)));
+	}
 	@Transactional
-	public MemberRequestDto register(String memberId, String password) {
+	public MemberDto register(String memberId, String password) {
 
 		memberRepository.findByMemberId(memberId).ifPresent(it -> {
-			throw new MemberException(ErrorCode.DUPLICATED_MEMBER_NAME);
+			throw new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID);
 		});
 
 		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password)));
 
-		return MemberRequestDto.fromMember(savedMember);
+		return MemberDto.fromMember(savedMember);
 	}
 
 	public String login(String memberId, String password) {
 		Member member = memberRepository.findByMemberId(memberId).orElseThrow(()
-			-> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 
 		//if(!member.getPassword().equals(password)) 인코딩 전
 		if(!encoder.matches(password, member.getPassword()))
-			throw new MemberException(ErrorCode.INVALID_PASSWORD);
+			throw new ApplicationException(ErrorCode.INVALID_PASSWORD);
 
 		//token
 		String token = JwtTokenUtils.generateToken(memberId, secretKey, expiredTimeMs);
