@@ -25,9 +25,16 @@ public class MemberService {
 	private Long expiredTimeMs;
 
 	public MemberDto loadMemberByMemberId(String memberId){
-		return memberRepository.findByMemberId(memberId).map(MemberDto::fromMember).orElseThrow(() ->
+		return memberRepository.findByMemberId(memberId).map(MemberDto::fromEntity).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format(" %s is not founded", memberId)));
 	}
+
+	public MemberDto getMember(String fromMemberId){
+		Member member = memberRepository.findByMemberId(fromMemberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		return MemberDto.fromEntity(member);
+	}
+
 	@Transactional
 	public MemberDto register(String memberId, String password) {
 
@@ -37,7 +44,7 @@ public class MemberService {
 
 		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password)));
 
-		return MemberDto.fromMember(savedMember);
+		return MemberDto.fromEntity(savedMember);
 	}
 
 	public String login(String memberId, String password) {
