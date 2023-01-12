@@ -9,6 +9,8 @@ import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -59,6 +61,18 @@ public class PostService{
 		}
 
 		postRepository.delete(post);
+	}
+
+	public Page<PostDto> list (Pageable pageable){
+		return postRepository.findAll(pageable).map(PostDto::fromPost);
+	}
+
+	public Page<PostDto> myPostList (String memberId, Pageable pageable){
+
+		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+
+		return postRepository.findAllByMemberId(member.getId(), pageable).map(PostDto::fromPost);
 	}
 
 }
