@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class PostServiceTest {
@@ -171,6 +173,30 @@ public class PostServiceTest {
 		ApplicationException e = Assertions.assertThrows(
 			ApplicationException.class, () -> postService.delete(memberId, 1L));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+	}
+
+	@Test
+	@DisplayName("피드 목록 조회 성공 테스트")
+	void FeedListSuccess(){
+
+		Pageable pageable = mock(Pageable.class);
+
+		when(postRepository.findAll(pageable)).thenReturn(Page.empty());
+
+		Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+	}
+
+	@Test
+	@DisplayName("내 피드 목록 조회 성공 테스트")
+	void MyFeedListSuccess(){
+
+		Pageable pageable = mock(Pageable.class);
+		Member member = mock(Member.class);
+
+		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
+		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
+
+		Assertions.assertDoesNotThrow(() -> postService.myPostList("", pageable));
 	}
 
 }

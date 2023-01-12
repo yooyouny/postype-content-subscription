@@ -6,6 +6,7 @@ import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.utill.JwtTokenUtils;
+import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +26,20 @@ public class MemberService {
 	private Long expiredTimeMs;
 
 	public MemberDto loadMemberByMemberId(String memberId){
-		return memberRepository.findByMemberId(memberId).map(MemberDto::fromMember).orElseThrow(() ->
+		return memberRepository.findByMemberId(memberId).map(MemberDto::fromEntity).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format(" %s is not founded", memberId)));
 	}
+
+	public MemberDto getMember(String fromMemberId){
+		Member member = memberRepository.findByMemberId(fromMemberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		return MemberDto.fromEntity(member);
+	}
+
+	public List<MemberDto> getMembers(List<Long> ids){
+		return memberRepository.findAllByIn(ids).stream().map(MemberDto::fromEntity).toList();
+	}
+
 	@Transactional
 	public MemberDto register(String memberId, String password) {
 
@@ -37,7 +49,7 @@ public class MemberService {
 
 		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password)));
 
-		return MemberDto.fromMember(savedMember);
+		return MemberDto.fromEntity(savedMember);
 	}
 
 	public String login(String memberId, String password) {

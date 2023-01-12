@@ -21,7 +21,7 @@ public class PostDto {
 			post.getId(),
 			post.getTitle(),
 			post.getBody(),
-			MemberDto.fromMember(post.getMember()),
+			MemberDto.fromEntity(post.getMember()),
 			post.getRegisteredAt(),
 			post.getUpdatedAt(),
 			post.getDeletedAt()

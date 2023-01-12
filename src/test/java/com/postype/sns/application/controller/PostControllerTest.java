@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -187,6 +189,56 @@ public class PostControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
 			.andExpect(status().isNotFound());
+	}
+
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("뉴스 피드 목록 조회 성공 테스트")
+	void NewsFeedSuccess() throws Exception {
+
+		when(postService.list(any())).thenReturn(Page.empty());
+
+		mockMvc.perform(get("/api/v1/posts")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isOk());
+	}
+	@Test
+	@WithAnonymousUser //인증 되지 않은 유저
+	@DisplayName("뉴스피드 목록 조회 시 로그인 하지 않은 경우 실패 테스트")
+	void NewsFeedFailCausedByNotLogin() throws Exception {
+
+		when(postService.list(any())).thenReturn(Page.empty());
+
+		mockMvc.perform(get("/api/v1/posts")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("내 뉴스 피드 목록 조회 성공 테스트")
+	void MyNewsFeedSuccess() throws Exception {
+
+		when(postService.myList(any(), any())).thenReturn(Page.empty());
+
+		mockMvc.perform(get("/api/v1/posts/my")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isOk());
+	}
+	@Test
+	@WithAnonymousUser //인증 되지 않은 유저
+	@DisplayName("내 뉴스 피드 목록 조회 시 로그인 하지 않은 경우 실패 테스트")
+	void MyNewsFeedFailCausedByNotLogin() throws Exception {
+
+		when(postService.myList(any(), any())).thenReturn(Page.empty());
+
+		mockMvc.perform(get("/api/v1/posts/my")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isUnauthorized());
 	}
 
 
