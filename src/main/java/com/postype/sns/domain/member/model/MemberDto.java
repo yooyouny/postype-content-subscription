@@ -22,7 +22,7 @@ public class MemberDto implements UserDetails {
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
 
-	public static MemberDto fromMember(Member member){
+	public static MemberDto fromEntity(Member member){
 		return new MemberDto(
 			member.getId(),
 			member.getMemberId(),
