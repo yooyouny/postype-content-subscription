@@ -43,6 +43,7 @@ public class PostController {
 		postService.delete(authentication.getName(), postId);
 		return Response.success();
 	}
+
 	@GetMapping
 	public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication){
 		return Response.success(postService.list(pageable).map(PostResponse::fromPostDto));
@@ -52,5 +53,7 @@ public class PostController {
 	public Response<Page<PostResponse>> myPostList(Pageable pageable, Authentication authentication){
 		return Response.success(postService.myPostList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
+
+
 
 }
