@@ -51,7 +51,7 @@ public class PostController {
 
 	@GetMapping("/my")
 	public Response<Page<PostResponse>> myPostList(Pageable pageable, Authentication authentication){
-		return Response.success(postService.myList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
+		return Response.success(postService.myPostList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
 
 
