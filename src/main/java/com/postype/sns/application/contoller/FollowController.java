@@ -1,9 +1,11 @@
 package com.postype.sns.application.contoller;
 
 import com.postype.sns.application.contoller.dto.response.FollowResponse;
+import com.postype.sns.application.contoller.dto.response.MemberResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
 import com.postype.sns.domain.member.model.FollowDto;
 import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.domain.member.model.entity.Follow;
 import com.postype.sns.domain.member.service.FollowService;
 import com.postype.sns.domain.member.service.MemberService;
 import java.util.List;
@@ -33,10 +35,10 @@ public class FollowController {
 	}
 
 	@GetMapping //dto를 controller client, contorller service사이에 쓸 수 있나? response로 쓰고 싶은데 못하겠음 ㅜ
-	public Response<List<FollowDto>> getFollowList(Authentication authentication){
+	public Response<List<MemberDto>> getFollowingsByMemberId(Authentication authentication) {
 		MemberDto fromMember = memberService.getMember(authentication.getName());
-		return Response.success(followService.getFollowList(fromMember));
+		List<FollowDto> followings = followService.getFollowList(fromMember);
+		List<Long> followingsMemberIds = followings.stream().map(FollowDto::getToMemberId).toList();
+		return Response.success(memberService.getMembers(followingsMemberIds));
 	}
-
-
 }

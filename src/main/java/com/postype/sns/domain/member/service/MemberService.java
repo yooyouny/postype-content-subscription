@@ -6,6 +6,7 @@ import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.utill.JwtTokenUtils;
+import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,10 @@ public class MemberService {
 		Member member = memberRepository.findByMemberId(fromMemberId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 		return MemberDto.fromEntity(member);
+	}
+
+	public List<MemberDto> getMembers(List<Long> ids){
+		return memberRepository.findAllByIn(ids).stream().map(MemberDto::fromEntity).toList();
 	}
 
 	@Transactional
