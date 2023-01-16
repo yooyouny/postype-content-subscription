@@ -38,4 +38,10 @@ public class FollowService {
 		return followRepository.findByFromMemberId(member.getId()).stream().map(
 			FollowDto::fromEntity).toList();
 	}
+
+	public List<FollowDto> getFollowers(MemberDto toMember){
+		Member member = memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
+			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		return followRepository.findByToMemberId(toMember.getId()).stream().map(FollowDto::fromEntity).toList();
+	}
 }

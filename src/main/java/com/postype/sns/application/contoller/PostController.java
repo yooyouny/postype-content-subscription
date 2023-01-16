@@ -4,6 +4,7 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
+import com.postype.sns.application.usecase.CreatePostUseCase;
 import com.postype.sns.application.usecase.TimeLinePostsUseCase;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
@@ -32,10 +33,12 @@ public class PostController {
 
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
 
+	private final CreatePostUseCase createPostUseCase;
+
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
-		postService.create(request.getTitle(), request.getBody(), authentication.getName());
+		createPostUseCase.execute(request.getTitle(), request.getBody(), authentication.getName());
 		return Response.success();
 	}
 
@@ -53,7 +56,7 @@ public class PostController {
 
 	@GetMapping
 	public Response<Page<PostResponse>> getPostList(Pageable pageable, Authentication authentication){
-		return Response.success(postService.list(pageable).map(PostResponse::fromPostDto));
+		return Response.success(postService.getList(pageable).map(PostResponse::fromPostDto));
 	}
 
 	@GetMapping("/my")
@@ -63,8 +66,7 @@ public class PostController {
 
 	@GetMapping("/member/timeline")
 	public PageCursor<Post> getTimeLine(Authentication authentication, CursorRequest request){
-		return timeLinePostsUseCase.execute(authentication.getName(), request);
-
+		return timeLinePostsUseCase.executeTimeLine(authentication.getName(), request);
 	}
 
 
