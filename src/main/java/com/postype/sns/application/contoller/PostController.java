@@ -4,6 +4,7 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
+import com.postype.sns.application.usecase.CreatePostUseCase;
 import com.postype.sns.application.usecase.TimeLinePostsUseCase;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
@@ -29,13 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
 	private final PostService postService;
-
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
+	private final CreatePostUseCase createPostUseCase;
 
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
-		postService.create(request.getTitle(), request.getBody(), authentication.getName());
+		createPostUseCase.execute(request.getTitle(), request.getBody(), authentication.getName());
 		return Response.success();
 	}
 
@@ -51,20 +52,19 @@ public class PostController {
 		return Response.success();
 	}
 
-	@GetMapping
+	@GetMapping //TODO :: 오프셋 기반 좋아요 순 으로 정렬 limit 30 size 10
 	public Response<Page<PostResponse>> getPostList(Pageable pageable, Authentication authentication){
-		return Response.success(postService.list(pageable).map(PostResponse::fromPostDto));
+		return Response.success(postService.getList(pageable).map(PostResponse::fromPostDto));
 	}
 
-	@GetMapping("/my")
+	@GetMapping("/my") //TODO :: 오프셋 기반 timestamp 내림차순으로 정렬
 	public Response<Page<PostResponse>> getMyPostList(Pageable pageable, Authentication authentication){
 		return Response.success(postService.getMyPostList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
 
 	@GetMapping("/member/timeline")
 	public PageCursor<Post> getTimeLine(Authentication authentication, CursorRequest request){
-		return timeLinePostsUseCase.execute(authentication.getName(), request);
-
+		return timeLinePostsUseCase.executeTimeLine(authentication.getName(), request);
 	}
 
 

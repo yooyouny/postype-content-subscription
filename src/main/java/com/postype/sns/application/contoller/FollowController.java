@@ -32,10 +32,13 @@ public class FollowController {
 		return Response.success(FollowResponse.fromFollowDto(dto));
 	}
 
+
+	//fromId가 팔로잉 하고 있는 목록 확인할 수 있음
 	@GetMapping //dto를 controller client, contorller service사이에 쓸 수 있나? response로 쓰고 싶은데 못하겠음 ㅜ
-	public Response<List<FollowDto>> getFollowList(Authentication authentication){
+	public List<FollowDto> getFollowList(Authentication authentication){
 		MemberDto fromMember = memberService.getMember(authentication.getName());
-		return Response.success(followService.getFollowList(fromMember));
+		followService.getFollowList(fromMember);
+		return followService.getFollowList(fromMember);
 	}
 
 
