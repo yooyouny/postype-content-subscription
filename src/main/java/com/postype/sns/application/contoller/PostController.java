@@ -4,6 +4,10 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
+import com.postype.sns.application.usecase.TimeLinePostsUseCase;
+import com.postype.sns.domain.member.model.util.CursorRequest;
+import com.postype.sns.domain.member.model.util.PageCursor;
+import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,9 @@ public class PostController {
 
 	private final PostService postService;
 
+	private final TimeLinePostsUseCase timeLinePostsUseCase;
+
+
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
 		postService.create(request.getTitle(), request.getBody(), authentication.getName());
@@ -45,14 +52,22 @@ public class PostController {
 	}
 
 	@GetMapping
-	public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication){
+	public Response<Page<PostResponse>> getPostList(Pageable pageable, Authentication authentication){
 		return Response.success(postService.list(pageable).map(PostResponse::fromPostDto));
 	}
 
 	@GetMapping("/my")
-	public Response<Page<PostResponse>> myPostList(Pageable pageable, Authentication authentication){
-		return Response.success(postService.myList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
+	public Response<Page<PostResponse>> getMyPostList(Pageable pageable, Authentication authentication){
+		return Response.success(postService.getMyPostList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
+
+	@GetMapping("/member/timeline")
+	public PageCursor<Post> getTimeLine(Authentication authentication, CursorRequest request){
+		return timeLinePostsUseCase.execute(authentication.getName(), request);
+
+	}
+
+
 
 
 
