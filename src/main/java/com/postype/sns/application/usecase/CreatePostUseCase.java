@@ -24,8 +24,8 @@ public class CreatePostUseCase {
 	private final MemberService memberService;
 	private final TimeLineService timeLineService;
 
-	public Long execute(String title, String body, String memberId){
-		Long postId = postService.create(title, body, memberId);
+	public Long execute(String title, String body, int price, String memberId){
+		Long postId = postService.create(title, body, memberId, price);
 
 		List<Long> followMemberIds = followService
 			.getFollowers(memberService.getMember(memberId))

@@ -1,18 +1,18 @@
 package com.postype.sns.domain.post.model;
 
-import com.postype.sns.domain.member.model.MemberRole;
 import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.order.model.Order;
+import com.postype.sns.domain.order.model.Point;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -41,6 +41,8 @@ public class Post {
 	@ManyToOne
 	@JoinColumn(name= "member_id")
 	private Member member;
+	@Column(name="price")
+	private Point price;
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -58,11 +60,12 @@ public class Post {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
-	public static Post of(String title, String body, Member member){
+	public static Post of(String title, String body, Member member, int price){
 		Post post = new Post();
 		post.setTitle(title);
 		post.setBody(body);
 		post.setMember(member);
+		post.setPrice(new Point(price));
 		return post;
 	}
 

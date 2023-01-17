@@ -1,6 +1,8 @@
 package com.postype.sns.domain.post.model;
 
 import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.domain.order.model.Order;
+import com.postype.sns.domain.order.model.Point;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +14,7 @@ public class PostDto {
 	private String title;
 	private String body;
 	private MemberDto member;
+	private Point price;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
@@ -22,6 +25,7 @@ public class PostDto {
 			post.getTitle(),
 			post.getBody(),
 			MemberDto.fromEntity(post.getMember()),
+			post.getPrice(),
 			post.getRegisteredAt(),
 			post.getUpdatedAt(),
 			post.getDeletedAt()

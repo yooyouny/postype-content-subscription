@@ -38,7 +38,7 @@ public class PostController {
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
-		createPostUseCase.execute(request.getTitle(), request.getBody(), authentication.getName());
+		createPostUseCase.execute(request.getTitle(), request.getBody(), request.getPrice(), authentication.getName());
 		return Response.success();
 	}
 

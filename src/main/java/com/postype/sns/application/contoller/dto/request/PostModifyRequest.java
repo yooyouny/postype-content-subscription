@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 public class PostModifyRequest {
 	private String title;
 	private String body;
+
+	private int price;
 }

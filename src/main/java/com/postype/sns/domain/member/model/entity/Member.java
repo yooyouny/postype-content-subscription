@@ -1,8 +1,12 @@
 package com.postype.sns.domain.member.model.entity;
 
+import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.MemberRole;
+import com.postype.sns.domain.order.model.Order;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,10 +14,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,6 +44,7 @@ public class Member {
 	@Column(name = "role")
 	@Enumerated(EnumType.STRING)
 	private MemberRole role = MemberRole.USER;
+
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -61,6 +66,13 @@ public class Member {
 		Member member = new Member();
 		member.setMemberId(memberId);
 		member.setPassword(password);
+		return member;
+	}
+
+	public static Member of(MemberDto dto){
+		Member member = new Member();
+		member.setMemberId(dto.getMemberId());
+		member.setPassword(dto.getPassword());
 		return member;
 	}
 

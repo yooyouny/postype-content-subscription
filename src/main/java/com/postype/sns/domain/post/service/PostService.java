@@ -23,12 +23,12 @@ public class PostService{
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
 	@Transactional
-	public Long create(String title, String body, String memberId){
+	public Long create(String title, String body, String memberId, int price){
 		//user find
 		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 		//post save
-		return postRepository.save(Post.of(title, body, foundedMember)).getId();
+		return postRepository.save(Post.of(title, body, foundedMember, price)).getId();
 	}
 
 	@Transactional
@@ -82,6 +82,8 @@ public class PostService{
 	public List<Post> getPostsByIds(List<Long> ids){
 		return postRepository.findAllByInId(ids);
 	}
+	public PostDto getPostById(Long id) {return postRepository.findById(id).map(PostDto::fromPost).orElseThrow(() ->
+		new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", id)));}
 
 	public PageCursor<Post> getTimeLinePosts(List<Long> memberIds, CursorRequest request){
 		List<Post> posts = findAllByMemberId(memberIds, request);
