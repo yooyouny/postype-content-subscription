@@ -27,6 +27,9 @@ public class FollowService {
 
 		log.error(fromMember.getId() + " " + toMember.getId());
 
+		memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
+			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+
 		Follow savedFollow = followRepository.save(Follow.of(fromMember.getId(), toMember.getId()));
 		return FollowDto.fromEntity(savedFollow);
 	}

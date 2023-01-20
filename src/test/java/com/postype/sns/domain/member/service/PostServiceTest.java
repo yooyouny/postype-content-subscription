@@ -185,7 +185,7 @@ public class PostServiceTest {
 
 		when(postRepository.findAll(pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getList(pageable));
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
 		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.myPostList("", pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getMyPostList("", pageable));
 	}
 
 }
