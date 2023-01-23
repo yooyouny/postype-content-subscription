@@ -24,17 +24,16 @@ public class CreatePostUseCase {
 	private final MemberService memberService;
 	private final TimeLineService timeLineService;
 
-	public Long execute(String title, String body, int price, String memberId){
-		Long postId = postService.create(title, body, memberId, price);
 
-		List<Long> followMemberIds = followService
+	//TODO :: 트랜잭션 걸지 않을 거임 팔로워 많을 경우 과부하
+	public Long execute(String title, String body, String memberId, int price){
+		Long postId = postService.create(title, body,  memberId, price);
+		List<Long> followedMemberIds = followService
 			.getFollowers(memberService.getMember(memberId))
 			.stream()
 			.map(FollowDto::getFromMemberId)
 			.toList();
-
-		timeLineService.deliveryToTimeLine(postId, followMemberIds);
-
+		timeLineService.deliveryToTimeLine(postId, followedMemberIds);
 		return postId;
 	}
 

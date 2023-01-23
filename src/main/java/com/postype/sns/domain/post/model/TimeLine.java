@@ -27,7 +27,7 @@ public class TimeLine {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name= "member_id")
-	private Long memberId;
+	private Long memberId; //delivery 되어야 할 memberId
 	@Column(name= "post_id")
 	private Long postId;
 	@Column(name = "register_at")

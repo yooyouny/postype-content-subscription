@@ -30,15 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
 	private final PostService postService;
-
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
-
 	private final CreatePostUseCase createPostUseCase;
 
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
-		createPostUseCase.execute(request.getTitle(), request.getBody(), request.getPrice(), authentication.getName());
+		createPostUseCase.execute(request.getTitle(), request.getBody(), authentication.getName(), request.getPrice());
 		return Response.success();
 	}
 
@@ -54,12 +52,12 @@ public class PostController {
 		return Response.success();
 	}
 
-	@GetMapping
+	@GetMapping //TODO :: 오프셋 기반 좋아요 순 으로 정렬 limit 30 size 10
 	public Response<Page<PostResponse>> getPostList(Pageable pageable, Authentication authentication){
 		return Response.success(postService.getList(pageable).map(PostResponse::fromPostDto));
 	}
 
-	@GetMapping("/my")
+	@GetMapping("/my") //TODO :: 오프셋 기반 timestamp 내림차순으로 정렬
 	public Response<Page<PostResponse>> getMyPostList(Pageable pageable, Authentication authentication){
 		return Response.success(postService.getMyPostList(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
