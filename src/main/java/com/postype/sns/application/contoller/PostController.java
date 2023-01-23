@@ -33,6 +33,8 @@ public class PostController {
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
 	private final CreatePostUseCase createPostUseCase;
 
+	private final CreatePostUseCase createPostUseCase;
+
 
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication){
