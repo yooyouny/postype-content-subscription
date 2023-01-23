@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberRegisterRequest{
-
-	private String memberId;
-	private String password;
-	private String memberName;
-
-	private String email;
+public class OrderCreateRequest {
+	private Long postId;
+	private int value;
 }

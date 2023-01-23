@@ -41,12 +41,13 @@ public class PostServiceTest {
 		String title = "title";
 		String body = "body";
 		String memberId = "memberId";
+		int price = 1000;
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.class)));
 		when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-		Assertions.assertDoesNotThrow(() -> postService.create(title, body, memberId));
+		Assertions.assertDoesNotThrow(() -> postService.create(title, body, memberId, price));
 	}
 
 	@Test
@@ -55,13 +56,14 @@ public class PostServiceTest {
 		String title = "title";
 		String body = "body";
 		String memberId = "memberId";
+		int price = 1000;
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
 		when(postRepository.save(any())).thenReturn(mock(Post.class));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.create(title, body, memberId));
+			ApplicationException.class, () -> postService.create(title, body, memberId, price));
 		Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND, e.getErrorCode());
 	}
 
@@ -183,7 +185,7 @@ public class PostServiceTest {
 
 		when(postRepository.findAll(pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getList(pageable));
 	}
 
 	@Test
@@ -196,7 +198,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
 		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.myPostList("", pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getMyPostList("", pageable));
 	}
 
 }

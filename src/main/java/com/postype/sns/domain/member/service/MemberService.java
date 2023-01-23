@@ -41,13 +41,13 @@ public class MemberService {
 	}
 
 	@Transactional
-	public MemberDto register(String memberId, String password) {
+	public MemberDto register(String memberId, String password, String memberName, String email) {
 
 		memberRepository.findByMemberId(memberId).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID);
 		});
 
-		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password)));
+		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password), memberName, email));
 
 		return MemberDto.fromEntity(savedMember);
 	}

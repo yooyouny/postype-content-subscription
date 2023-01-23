@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
-public class MemberContoller {
+public class MemberController {
 
 	private final MemberService memberService;
 
 	@PostMapping("/register")
 	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
 		return Response.success(
-			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword())));
+			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword(), request.getMemberName(), request.getEmail())));
 	}
 
 	@PostMapping("/login")

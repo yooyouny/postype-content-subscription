@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.Where;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @SQLDelete(sql = "UPDATE follow SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
 //TODO :: table에 인덱스 추가

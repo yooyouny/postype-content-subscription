@@ -27,6 +27,9 @@ public class FollowService {
 
 		log.error(fromMember.getId() + " " + toMember.getId());
 
+		memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
+			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+
 		Follow savedFollow = followRepository.save(Follow.of(fromMember.getId(), toMember.getId()));
 		return FollowDto.fromEntity(savedFollow);
 	}
@@ -37,5 +40,11 @@ public class FollowService {
 
 		return followRepository.findByFromMemberId(member.getId()).stream().map(
 			FollowDto::fromEntity).toList();
+	}
+	//해당 멤버를 팔로잉 하고 있는 멤버들의 목록을 반환
+	public List<FollowDto> getFollowers(MemberDto toMember){
+		Member member = memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
+			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		return followRepository.findByToMemberId(toMember.getId()).stream().map(FollowDto::fromEntity).toList();
 	}
 }

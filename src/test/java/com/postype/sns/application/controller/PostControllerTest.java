@@ -4,6 +4,7 @@ package com.postype.sns.application.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +18,8 @@ import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.domain.member.model.util.CursorRequest;
+import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.fixture.PostFixture;
@@ -56,7 +59,7 @@ public class PostControllerTest {
 
 		mockMvc.perform(post("/api/v1/posts")
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
+					.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body, 0)))
 			).andDo(print())
 			.andExpect(status().isOk());
 	}
@@ -68,10 +71,11 @@ public class PostControllerTest {
 
 		String title = "title";
 		String body = "body";
+		int price = 0;
 
 		mockMvc.perform(post("/api/v1/posts")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body)))
+				.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body, price)))
 			).andDo(print())
 			.andExpect(status().isUnauthorized());
 	}
@@ -89,7 +93,7 @@ public class PostControllerTest {
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
+				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, 0)))
 			).andDo(print())
 			.andExpect(status().isOk());
 	}
@@ -104,7 +108,7 @@ public class PostControllerTest {
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
+				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, 0)))
 			).andDo(print())
 			.andExpect(status().is(ErrorCode.INVALID_TOKEN.getStatus().value()));
 	}
@@ -121,7 +125,7 @@ public class PostControllerTest {
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
+				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, 0)))
 			).andDo(print())
 			.andExpect(status().isUnauthorized());
 	}
@@ -140,7 +144,7 @@ public class PostControllerTest {
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body)))
+				.content(objectMapper.writeValueAsBytes(new PostModifyRequest(title, body, 0)))
 			).andDo(print())
 			.andExpect(status().isNotFound());
 	}
@@ -196,7 +200,7 @@ public class PostControllerTest {
 	@DisplayName("뉴스 피드 목록 조회 성공 테스트")
 	void NewsFeedSuccess() throws Exception {
 
-		when(postService.list(any())).thenReturn(Page.empty());
+		when(postService.getList(any())).thenReturn(Page.empty());
 
 		mockMvc.perform(get("/api/v1/posts")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -208,7 +212,7 @@ public class PostControllerTest {
 	@DisplayName("뉴스피드 목록 조회 시 로그인 하지 않은 경우 실패 테스트")
 	void NewsFeedFailCausedByNotLogin() throws Exception {
 
-		when(postService.list(any())).thenReturn(Page.empty());
+		when(postService.getList(any())).thenReturn(Page.empty());
 
 		mockMvc.perform(get("/api/v1/posts")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -221,7 +225,7 @@ public class PostControllerTest {
 	@DisplayName("내 뉴스 피드 목록 조회 성공 테스트")
 	void MyNewsFeedSuccess() throws Exception {
 
-		when(postService.myList(any(), any())).thenReturn(Page.empty());
+		when(postService.getMyPostList(any(), any())).thenReturn(Page.empty());
 
 		mockMvc.perform(get("/api/v1/posts/my")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -233,12 +237,23 @@ public class PostControllerTest {
 	@DisplayName("내 뉴스 피드 목록 조회 시 로그인 하지 않은 경우 실패 테스트")
 	void MyNewsFeedFailCausedByNotLogin() throws Exception {
 
-		when(postService.myList(any(), any())).thenReturn(Page.empty());
+		when(postService.getMyPostList(any(), any())).thenReturn(Page.empty());
 
 		mockMvc.perform(get("/api/v1/posts/my")
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
 			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("포스트 저장 시 타임라인 저장 성공 테스트")
+	void saveTimeLineSuccess(){
+		String memberId = "member";
+		CursorRequest cursorRequest = mock(CursorRequest.class);
+
+		//when(timeLinePostsUseCase.executeTimeLine(memberId, cursorRequest)).thenReturn(PageCursor .class);
+
 	}
 
 
