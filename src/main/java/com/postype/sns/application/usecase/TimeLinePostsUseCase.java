@@ -12,6 +12,7 @@ import com.postype.sns.domain.post.model.TimeLine;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.domain.post.service.TimeLineService;
 import java.util.List;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class TimeLinePostsUseCase {
 		List<Long> followingMemberIds = followings.stream().map(FollowDto::getToMemberId).toList();
 		return postService.getTimeLinePosts(followingMemberIds, request);
 	}
+
 
 	public PageCursor<Post> executeTimeLine(String memberId, CursorRequest request){//push
 		MemberDto member = memberService.getMember(memberId);

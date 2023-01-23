@@ -35,13 +35,15 @@ public class MemberServiceTest {
 	void registerOk(){
 		String memberId = "memberId";
 		String password = "password";
+		String memberName = "memberName";
+		String email = "email";
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
 		when(encoder.encode(password)).thenReturn("encrypt password");
 		when(memberRepository.save(any())).thenReturn(MemberFixture.get(memberId,password,1L));
 
-		Assertions.assertDoesNotThrow(() -> memberService.register(memberId, password));
+		Assertions.assertDoesNotThrow(() -> memberService.register(memberId, password, memberName, email));
 	}
 
 	@Test
@@ -49,6 +51,8 @@ public class MemberServiceTest {
 	void registerFailCausedByDuplicatedId(){
 		String memberId = "memberId";
 		String password = "password";
+		String memberName = "memberName";
+		String email = "email";
 
 		Member fixture = MemberFixture.get(memberId, password, 1L);
 		//mocking
@@ -57,7 +61,7 @@ public class MemberServiceTest {
 		when(memberRepository.save(any())).thenReturn(Optional.of(fixture));
 
 	 	ApplicationException e =	Assertions.assertThrows(
-			ApplicationException.class, () -> memberService.register(memberId, password));
+			ApplicationException.class, () -> memberService.register(memberId, password, memberName, email));
 		 Assertions.assertEquals(ErrorCode.DUPLICATED_MEMBER_ID, e.getErrorCode());
 	}
 

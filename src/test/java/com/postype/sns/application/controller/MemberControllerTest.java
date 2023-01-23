@@ -41,12 +41,14 @@ public class MemberControllerTest {
 	public void registerSuccess() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
+		String memberName = "memberName";
+		String email = "email";
 
-		when(memberService.register(memberId, password)).thenReturn(mock(MemberDto.class));
+		when(memberService.register(memberId, password, memberName, email)).thenReturn(mock(MemberDto.class));
 
 		mockMvc.perform(post("/api/v1/members/register")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password)))
+			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password, memberName, email)))
 		).andDo(print())
 			.andExpect(status().isOk());
 	}
@@ -56,13 +58,15 @@ public class MemberControllerTest {
 	public void registerFailCausedByDuplicatedId() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
+		String memberName = "memberName";
+		String email = "email";
 
-		when(memberService.register(memberId, password)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
+		when(memberService.register(memberId, password, memberName, email)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				// TODO : add request body
-			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password)))
+			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password, memberName, email)))
 		).andDo(print())
 			.andExpect(status().isConflict());
 

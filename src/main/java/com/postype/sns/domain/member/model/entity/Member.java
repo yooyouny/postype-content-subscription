@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.tomcat.util.digester.ArrayStack;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -44,7 +45,8 @@ public class Member {
 	@Column(name = "role")
 	@Enumerated(EnumType.STRING)
 	private MemberRole role = MemberRole.USER;
-
+	@OneToMany(mappedBy = "member")
+	private List<Order> orders = new ArrayList<Order>();
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -62,18 +64,31 @@ public class Member {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 	//새 멤버 엔티티를 만들어 주는 메소드
-	public static Member of(String memberId, String password){
+	public static Member of(String memberId, String password, String memberName, String email){
 		Member member = new Member();
 		member.setMemberId(memberId);
 		member.setPassword(password);
+		member.setMemberName(memberName);
+		member.setEmail(email);
 		return member;
 	}
 
 	public static Member of(MemberDto dto){
 		Member member = new Member();
+		member.setId(dto.getId());
 		member.setMemberId(dto.getMemberId());
 		member.setPassword(dto.getPassword());
+		member.setMemberName(dto.getMemberName());
+		member.setEmail(dto.getEmail());
+		member.setRole(dto.getRole());
 		return member;
+	}
+	public int getTotalPrice(){
+		int totalPrice = 0;
+		for(Order order : orders){
+			totalPrice += order.getPrice().getValue();
+		}
+		return totalPrice;
 	}
 
 }

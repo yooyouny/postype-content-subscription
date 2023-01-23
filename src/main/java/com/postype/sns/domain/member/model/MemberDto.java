@@ -16,6 +16,7 @@ public class MemberDto implements UserDetails {
 	private Long id;
 	private String memberId;
 	private String password;
+	private String memberName;
 	private String email;
 	private MemberRole role;
 	private Timestamp registeredAt;
@@ -27,6 +28,7 @@ public class MemberDto implements UserDetails {
 			member.getId(),
 			member.getMemberId(),
 			member.getPassword(),
+			member.getMemberName(),
 			member.getEmail(),
 			member.getRole(),
 			member.getRegisteredAt(),
