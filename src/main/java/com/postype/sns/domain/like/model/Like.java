@@ -1,9 +1,7 @@
-package com.postype.sns.domain.post.model;
+package com.postype.sns.domain.like.model;
 
-import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.entity.Member;
-import com.postype.sns.domain.order.model.Order;
-import com.postype.sns.domain.order.model.Point;
+import com.postype.sns.domain.post.model.Post;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
@@ -13,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -24,24 +21,22 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Table(name = "\"post\"")
+@Table(name = "\"likes\"")
 @Getter
 @Setter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE likes SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Post {
+public class Like {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String title;
-	@Column(columnDefinition = "TEXT")
-	private String body;
 	@ManyToOne
 	@JoinColumn(name= "member_id")
 	private Member member;
-	@Column(name="price")
-	private Point price;
+	@ManyToOne
+	@JoinColumn(name= "post_id")
+	private Post post;
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -59,26 +54,11 @@ public class Post {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
-	public static Post of(String title, String body, Member member, int price){
-		Post post = new Post();
-		post.setTitle(title);
-		post.setBody(body);
-		post.setMember(member);
-		post.setPrice(new Point(price));
-		return post;
-	}
-
-	public static Post of(PostDto dto){
-		Post post = new Post();
-		post.setId(dto.getId());
-		post.setTitle(dto.getTitle());
-		post.setBody(dto.getBody());
-		post.setMember(Member.of(dto.getMember()));
-		post.setPrice(dto.getPrice());
-		post.setRegisteredAt(dto.getRegisteredAt());
-		post.setUpdatedAt(dto.getUpdatedAt());
-		post.setDeletedAt(dto.getDeletedAt());
-		return post;
+	public static Like of(Member member, Post post){
+		Like like = new Like();
+		like.setMember(member);
+		like.setPost(post);
+		return like;
 	}
 
 }

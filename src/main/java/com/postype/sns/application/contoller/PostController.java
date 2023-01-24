@@ -11,6 +11,7 @@ import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +68,21 @@ public class PostController {
 		return timeLinePostsUseCase.executeTimeLine(authentication.getName(), request);
 	}
 
+	@PostMapping("{postId}/likes")
+	public Response<Void> like(@PathVariable Long postId, Authentication authentication){
+		postService.like(postId, authentication.getName());
+		return Response.success();
+	}
+
+	@GetMapping("{postId}/likes")
+	public Response<Integer> getLike(@PathVariable Long postId){
+		return Response.success(postService.getLikeCount(postId));
+	}
+
+	@GetMapping("/likes")
+	public Response<List<PostDto>> getLikePosts(Authentication authentication){
+		return Response.success(postService.getLikePosts(authentication.getName()));
+	}
 
 
 

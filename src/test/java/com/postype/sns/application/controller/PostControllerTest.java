@@ -256,6 +256,37 @@ public class PostControllerTest {
 
 	}
 
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("좋아요 기능 성공 테스트")
+	void likeCreateSuccess() throws Exception {
+		mockMvc.perform(post("/api/v1/posts/1/likes")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isOk());
+	}
+	@Test
+	@WithAnonymousUser //인증 되지 않은 유저
+	@DisplayName("좋아요 클릭 시 로그인 하지 않은 경우 실패 테스트")
+	void likeCreateFailCausedByNotLogin() throws Exception {
+
+		mockMvc.perform(post("/api/v1/posts/1/likes")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@WithMockUser //인증 된 유저
+	@DisplayName("좋아요 클릭 시 포스트가 없는 경우 실패 테스트")
+	void likeCreateFailCausedByNotFoundedPost() throws Exception {
+		doThrow(new ApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).like(any(), any());
+
+		mockMvc.perform(post("/api/v1/posts/1/likes")
+				.contentType(MediaType.APPLICATION_JSON)
+			).andDo(print())
+			.andExpect(status().isNotFound());
+	}
 
 
 

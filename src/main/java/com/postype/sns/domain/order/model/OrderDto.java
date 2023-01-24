@@ -13,15 +13,15 @@ public class OrderDto {
 	private Long id;
 	private String memberId;
 	private Long postId;
-	private int value;
-	private Timestamp orderAt;
+	private int price;
+	private Timestamp registerAt;
 	public static OrderDto fromEntity(Order order){
 		return new OrderDto(
 			order.getId(),
 			order.getMember().getMemberId(),
-			order.getPostId(),
-			order.getPrice().getValue(),
-			order.getOrderAt()
+			order.getPost().getId(),
+			order.getPost().getPrice().getValue(),
+			order.getRegisterAt()
 		);
 	}
 }

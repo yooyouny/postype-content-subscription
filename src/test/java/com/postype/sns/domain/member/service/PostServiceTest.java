@@ -1,19 +1,24 @@
 package com.postype.sns.domain.member.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.domain.like.model.Like;
+import com.postype.sns.domain.like.repository.LikeRepository;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.domain.post.service.PostService;
+import com.postype.sns.fixture.LikeFixture;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @SpringBootTest
 public class PostServiceTest {
@@ -31,9 +37,10 @@ public class PostServiceTest {
 
 	@MockBean
 	private PostRepository postRepository;
-
 	@MockBean
 	private MemberRepository memberRepository;
+	@MockBean
+	private LikeRepository likeRepository;
 
 	@Test
 	@DisplayName("포스트 작성 성공 테스트")
@@ -200,5 +207,64 @@ public class PostServiceTest {
 
 		Assertions.assertDoesNotThrow(() -> postService.getMyPostList("", pageable));
 	}
+
+	@Test
+	@WithMockUser
+	@Transactional
+	@DisplayName("포스트 좋아요 성공 테스트")
+	void LikeCreateSuccess(){
+		String memberId = "memberId";
+		Long postId = 1L;
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(likeRepository.save(Like.of(member, post))).thenReturn(mock(Like.class));
+
+		Assertions.assertDoesNotThrow(() -> postService.like(postId, memberId));
+	}
+
+	@Test
+	@WithMockUser
+	@DisplayName("이미 포스트의 좋아요를 클릭한 경우 실패 테스트")
+	void LikeCreateFailCausedByAlreadyLike(){
+		String memberId = "memberId";
+		Long postId = 1L;
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(likeRepository.findByMemberAndPost(member, post)).thenReturn(Optional.of(mock(Like.class)));
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		ApplicationException e = Assertions.assertThrows(
+			ApplicationException.class, () -> postService.like(postId, memberId));
+		Assertions.assertEquals(ErrorCode.ALREADY_LIKE, e.getErrorCode());
+	}
+
+	@Test
+	@WithMockUser
+	@DisplayName("좋아요를 누른 포스트가 존재하지 않는 경우 실패 테스트")
+	void LikeCreateFailCausedByNotFoundedPost(){
+		String memberId = "memberId";
+		Long postId = 1L;
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+		when(likeRepository.save(Like.of(member, post))).thenReturn(mock(Like.class));
+
+		ApplicationException e = Assertions.assertThrows(
+			ApplicationException.class, () -> postService.like(postId, memberId));
+		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+	}
+
+
 
 }

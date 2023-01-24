@@ -64,7 +64,7 @@ public class OrderServiceTest {
 		String password = "test";
 		Member memberFixture = MemberFixture.get(memberId, password, 1L);
 		Post postFixture = PostFixture.get(memberId, 2L, 1L);
-		Order orderFixture = OrderFixture.get(memberFixture, postFixture.getId(), postFixture.getPrice());
+		Order orderFixture = OrderFixture.get(memberFixture, postFixture);
 		orderFixture.setMember(memberFixture);
 
 		when(orderRepository.save(orderFixture)).thenReturn(orderFixture);
@@ -73,7 +73,7 @@ public class OrderServiceTest {
 
 		ApplicationException e = Assertions.assertThrows(ApplicationException.class,
 			() -> orderService.create(MemberDto.fromEntity(memberFixture), PostDto.fromPost(postFixture)));
-		Assertions.assertEquals(ErrorCode.DUPLICATED_KEY, e.getErrorCode());
+		Assertions.assertEquals(ErrorCode.ALREADY_ORDER, e.getErrorCode());
 	}
 
 

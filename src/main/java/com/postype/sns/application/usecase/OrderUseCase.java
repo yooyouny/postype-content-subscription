@@ -6,6 +6,7 @@ import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.domain.order.model.Order;
 import com.postype.sns.domain.order.model.OrderDto;
 import com.postype.sns.domain.order.service.OrderService;
+import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.model.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import java.util.List;
@@ -21,18 +22,16 @@ public class OrderUseCase {
 	private final PostService postService;
 	private final OrderService orderService;
 
-
-	//TODO :: 이미 구입한 포스트면 예외 발생
 	@Transactional
 	public OrderDto create(String memberId, Long postId){
 		MemberDto member = memberService.getMember(memberId);
-		PostDto post = postService.getPostById(postId);
+		PostDto post = postService.getPost(postId);
 		return orderService.create(member, post);
 	}
 
 	public OrderDto getOrder(String memberId, Long postId){
 		MemberDto member = memberService.getMember(memberId);
-		PostDto post = postService.getPostById(postId);
+		PostDto post = postService.getPost(postId);
 		return orderService.findByMemberIdAndPostId(member, post);
 	}
 

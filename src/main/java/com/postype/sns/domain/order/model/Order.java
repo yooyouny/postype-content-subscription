@@ -41,18 +41,16 @@ public class Order {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="member_id")
 	private Member member;
-	@Column(name = "post_id")
-	private Long postId;
-	@Embedded
-	private Point price;
-	@Column(name="order_at")
-	private Timestamp orderAt;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="post_id")
+	private Post post;
+	@Column(name="register_at")
+	private Timestamp registerAt;
 
-	public static Order of(Member member, Long postId, Point price){
+	public static Order of(Member member, Post post){
 		Order order = new Order();
 		order.setMember(member);
-		order.postId = postId;
-		order.price = price;
+		order.post = post;
 		return order;
 	}
 	public void setMember(Member member){
@@ -65,7 +63,7 @@ public class Order {
 
 	@PrePersist
 	void orderAt() {
-		this.orderAt = Timestamp.from(Instant.now());
+		this.registerAt = Timestamp.from(Instant.now());
 	}
 
 

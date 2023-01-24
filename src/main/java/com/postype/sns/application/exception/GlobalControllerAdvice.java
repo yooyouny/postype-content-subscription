@@ -19,13 +19,6 @@ public class GlobalControllerAdvice {
 			.body(Response.error(e.getErrorCode().name()));
 	}
 
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity applicationHandler(DataIntegrityViolationException e){
-		log.error("Error occurs {}", e.toString());
-		return ResponseEntity.status(HttpStatus.CONFLICT)
-			.body(Response.error(ErrorCode.DUPLICATED_KEY.name()));
-	}
-
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<?> applicationHandler(RuntimeException e){
 		log.error("Error occurs {}", e.toString());

@@ -24,10 +24,12 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 
 	public OrderDto create(MemberDto member, PostDto post){
-		orderRepository.findAllByMemberIdAndPostId(member.getId(), post.getId()).ifPresent(it ->
-			new ApplicationException(ErrorCode.DUPLICATED_KEY)); //왜 못잡지???
+		orderRepository.findAllByMemberIdAndPostId(member.getId(), post.getId()).ifPresent(it -> {
+			throw new ApplicationException(ErrorCode.ALREADY_ORDER,
+				String.format("%s already ordered this post", member.getMemberId()));
+		});
 
-		Order order = orderRepository.save(Order.of(Member.of(member), post.getId(), post.getPrice()));
+		Order order = orderRepository.save(Order.of(Member.of(member), Post.of(post)));
 
 		return OrderDto.fromEntity(order);
 	}

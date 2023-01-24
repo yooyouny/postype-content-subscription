@@ -83,12 +83,5 @@ public class Member {
 		member.setRole(dto.getRole());
 		return member;
 	}
-	public int getTotalPrice(){
-		int totalPrice = 0;
-		for(Order order : orders){
-			totalPrice += order.getPrice().getValue();
-		}
-		return totalPrice;
-	}
 
 }
