@@ -2,6 +2,8 @@ package com.postype.sns.domain.post.service;
 
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.domain.like.model.Like;
+import com.postype.sns.domain.like.repository.LikeRepository;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
@@ -22,6 +24,8 @@ public class PostService{
 
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
+	private final LikeRepository likeRepository;
+
 	@Transactional
 	public Long create(String title, String body, String memberId, int price){
 		//user find
@@ -82,8 +86,10 @@ public class PostService{
 	public List<Post> getPostsByIds(List<Long> ids){
 		return postRepository.findAllByInId(ids);
 	}
-	public PostDto getPostById(Long id) {return postRepository.findById(id).map(PostDto::fromPost).orElseThrow(() ->
-		new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", id)));}
+	public PostDto getPost(Long id) {
+		return postRepository.findById(id).map(PostDto::fromPost).orElseThrow(() ->
+		new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", id)));
+	}
 
 	public PageCursor<Post> getTimeLinePosts(List<Long> memberIds, CursorRequest request){
 		List<Post> posts = findAllByMemberId(memberIds, request);
@@ -102,4 +108,37 @@ public class PostService{
 
 	}
 
+	@Transactional
+	public void like(Long postId, String memberId){
+		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+
+		Post post = postRepository.findById(postId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+
+		//check like
+		likeRepository.findByMemberAndPost(member, post).ifPresent(it -> {
+			throw new ApplicationException(ErrorCode.ALREADY_LIKE,
+				String.format("memberName %s already like post %d", memberId, postId));
+		});
+		likeRepository.save(Like.of(member, post));
+	}
+
+	public int getLikeCount(Long postId) {
+		Post post = postRepository.findById(postId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+
+		return likeRepository.countByPost(post.getId());
+	}
+
+	public List<PostDto> getLikePosts(String memberId) {
+		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+
+		List<Like> likedList = likeRepository.findAllByMember(member);
+		List<Post> postList = likedList.stream().map(Like::getPost).toList();
+
+		return postRepository.findAllByInId(postList.stream().map(Post::getId).toList())
+			.stream().map(PostDto::fromPost).toList();
+	}
 }

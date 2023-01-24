@@ -51,7 +51,7 @@ public class OrderControllerTest {
 		Post post = PostFixture.get(member.getMemberId(), 1L, 1L);
 
 		when(orderService.create(MemberDto.fromEntity(member), PostDto.fromPost(post)))
-			.thenReturn(OrderDto.fromEntity(Order.of(member, post.getId(), post.getPrice())));
+			.thenReturn(OrderDto.fromEntity(Order.of(member, post)));
 
 		mockMvc.perform(post("/api/v1/order/1")
 			.contentType(MediaType.APPLICATION_JSON)

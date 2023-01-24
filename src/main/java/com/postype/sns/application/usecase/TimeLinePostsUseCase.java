@@ -3,6 +3,7 @@ package com.postype.sns.application.usecase;
 import com.postype.sns.domain.member.model.FollowDto;
 import com.postype.sns.domain.member.model.MemberDto;
 import com.postype.sns.domain.member.model.entity.Follow;
+import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.service.FollowService;

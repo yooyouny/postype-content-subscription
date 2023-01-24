@@ -14,7 +14,6 @@ public class OrderResponse {
 	private String memberId;
 	private Long postId;
 	private int value;
-
 	private Timestamp orderAt;
 
 	public static OrderResponse fromDto(OrderDto order){
@@ -22,8 +21,8 @@ public class OrderResponse {
 			order.getId(),
 			order.getMemberId(),
 			order.getPostId(),
-			order.getValue(),
-			order.getOrderAt()
+			order.getPrice(),
+			order.getRegisterAt()
 		);
 	}
 
