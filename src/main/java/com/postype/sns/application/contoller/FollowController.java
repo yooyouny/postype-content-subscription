@@ -2,9 +2,8 @@ package com.postype.sns.application.contoller;
 
 import com.postype.sns.application.contoller.dto.response.FollowResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
-import com.postype.sns.domain.member.model.FollowDto;
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.application.contoller.dto.FollowDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.service.FollowService;
 import com.postype.sns.domain.member.service.MemberService;
 import java.util.List;

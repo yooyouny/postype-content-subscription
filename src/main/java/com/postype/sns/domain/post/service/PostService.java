@@ -1,15 +1,18 @@
 package com.postype.sns.domain.post.service;
 
+import com.postype.sns.application.contoller.dto.CommentDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.like.model.Like;
-import com.postype.sns.domain.like.repository.LikeRepository;
+import com.postype.sns.domain.post.model.Comment;
+import com.postype.sns.domain.post.model.Like;
+import com.postype.sns.domain.post.repository.CommentRepository;
+import com.postype.sns.domain.post.repository.LikeRepository;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.domain.post.model.PostDto;
+import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -25,12 +28,12 @@ public class PostService{
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
 	private final LikeRepository likeRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public Long create(String title, String body, String memberId, int price){
 		//user find
-		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+		Member foundedMember = getMemberOrException(memberId);
 		//post save
 		return postRepository.save(Post.of(title, body, foundedMember, price)).getId();
 	}
@@ -38,12 +41,9 @@ public class PostService{
 	@Transactional
 	public PostDto modify(String title, String body, String memberId, Long postId){
 		//user find
-		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
-
+		Member foundedMember = getMemberOrException(memberId);
 		//post exist
-		Post post = postRepository.findById(postId).orElseThrow(() ->
-			 new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+		Post post = getPostOrException(postId);
 
 		//post permission
 		if(post.getMember() != foundedMember){
@@ -57,11 +57,8 @@ public class PostService{
 	@Transactional
 	public void delete(String memberId, Long postId){
 		//user find
-		Member foundedMember = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
-
-		Post post = postRepository.findById(postId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+		Member foundedMember = getMemberOrException(memberId);
+		Post post = getPostOrException(postId);
 
 		if(post.getMember() != foundedMember){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
@@ -77,9 +74,7 @@ public class PostService{
 	//내가 쓴 글 읽기
 	public Page<PostDto> getMyPostList (String memberId, Pageable pageable){
 
-		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
-
+		Member member = getMemberOrException(memberId);
 		return postRepository.findAllByMemberId(member.getId(), pageable).map(PostDto::fromPost);
 	}
 
@@ -110,11 +105,8 @@ public class PostService{
 
 	@Transactional
 	public void like(Long postId, String memberId){
-		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
-
-		Post post = postRepository.findById(postId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+		Member member = getMemberOrException(memberId);
+		Post post = getPostOrException(postId);
 
 		//check like
 		likeRepository.findByMemberAndPost(member, post).ifPresent(it -> {
@@ -125,20 +117,40 @@ public class PostService{
 	}
 
 	public int getLikeCount(Long postId) {
-		Post post = postRepository.findById(postId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+		Post post = getPostOrException(postId);
 
 		return likeRepository.countByPost(post.getId());
 	}
 
 	public List<PostDto> getLikePosts(String memberId) {
-		Member member = memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+		Member member = getMemberOrException(memberId);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
 		List<Post> postList = likedList.stream().map(Like::getPost).toList();
 
 		return postRepository.findAllByInId(postList.stream().map(Post::getId).toList())
 			.stream().map(PostDto::fromPost).toList();
+	}
+
+	@Transactional
+	public void comment(Long postId, String memberId, String comment){
+		Member member = getMemberOrException(memberId);
+		Post post = getPostOrException(postId);
+
+		//comment save
+		commentRepository.save(Comment.of(member, post, comment));
+	}
+
+	public Page<CommentDto> getComment(Long postId, Pageable pageable){
+		Post post = getPostOrException(postId);
+		return commentRepository.findAllByPost(post, pageable).map(CommentDto::fromEntity);
+	}
+	private Post getPostOrException(Long postId){
+		return postRepository.findById(postId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
+	}
+	private Member getMemberOrException(String memberId){
+		return memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 	}
 }

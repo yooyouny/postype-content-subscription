@@ -1,7 +1,6 @@
 package com.postype.sns.fixture;
 
-import com.postype.sns.domain.like.model.Like;
-import com.postype.sns.domain.member.model.MemberRole;
+import com.postype.sns.domain.post.model.Like;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.post.model.Post;
 import java.sql.Timestamp;

@@ -1,10 +1,7 @@
 package com.postype.sns.domain.post.repository;
 
-import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.domain.post.model.PostDto;
 import java.util.List;
-import java.util.stream.LongStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

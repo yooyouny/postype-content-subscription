@@ -1,9 +1,7 @@
 package com.postype.sns.application.usecase;
 
-import com.postype.sns.domain.member.model.FollowDto;
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.entity.Follow;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.application.contoller.dto.FollowDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.service.FollowService;
@@ -15,7 +13,6 @@ import com.postype.sns.domain.post.service.TimeLineService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Service
 @RequiredArgsConstructor

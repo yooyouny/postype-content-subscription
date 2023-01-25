@@ -1,7 +1,6 @@
 package com.postype.sns.domain.member.model.entity;
 
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.MemberRole;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.order.model.Order;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -21,7 +20,6 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.tomcat.util.digester.ArrayStack;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 

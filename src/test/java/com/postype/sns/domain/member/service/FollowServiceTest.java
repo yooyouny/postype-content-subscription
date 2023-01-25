@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.exception.ErrorCode;
-import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.model.entity.Follow;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.FollowRepository;
@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

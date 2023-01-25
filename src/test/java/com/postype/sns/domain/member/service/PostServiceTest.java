@@ -1,20 +1,20 @@
 package com.postype.sns.domain.member.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.like.model.Like;
-import com.postype.sns.domain.like.repository.LikeRepository;
+import com.postype.sns.domain.post.model.Comment;
+import com.postype.sns.domain.post.model.Like;
+import com.postype.sns.domain.post.repository.CommentRepository;
+import com.postype.sns.domain.post.repository.LikeRepository;
 import com.postype.sns.domain.member.model.entity.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.domain.post.service.PostService;
-import com.postype.sns.fixture.LikeFixture;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;
 import java.util.Optional;
@@ -41,6 +41,8 @@ public class PostServiceTest {
 	private MemberRepository memberRepository;
 	@MockBean
 	private LikeRepository likeRepository;
+	@MockBean
+	private CommentRepository commentRepository;
 
 	@Test
 	@DisplayName("포스트 작성 성공 테스트")
@@ -264,6 +266,47 @@ public class PostServiceTest {
 			ApplicationException.class, () -> postService.like(postId, memberId));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
+
+	@Test
+	@WithMockUser
+	@Transactional
+	@DisplayName("코멘트 등록 성공 테스트")
+	void CommentCreateSuccess(){
+		String memberId = "memberId";
+		Long postId = 1L;
+		String comment = "comment";
+
+		//mocking
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(commentRepository.save(Comment.of(member, post, comment))).thenReturn(mock(Comment.class));
+
+		Assertions.assertDoesNotThrow(() -> postService.comment(postId, memberId, comment));
+	}
+
+	@Test
+	@WithMockUser
+	@DisplayName("코멘트를 등록할 떄 포스트가 존재하지 않는 경우 실패 테스트")
+	void CommentCreateFailCausedByNotFoundedPost(){
+		String memberId = "memberId";
+		Long postId = 1L;
+		String comment = "comment";
+		Post post = PostFixture.get(memberId, postId, 1L);
+		Member member = post.getMember();
+
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+		when(commentRepository.save(Comment.of(member, post, comment))).thenReturn(mock(Comment.class));
+
+		ApplicationException e = Assertions.assertThrows(
+			ApplicationException.class, () -> postService.like(postId, memberId));
+		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+	}
+
+
 
 
 

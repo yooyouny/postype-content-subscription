@@ -1,14 +1,11 @@
-package com.postype.sns.domain.post.model;
+package com.postype.sns.application.contoller.dto;
 
-import com.postype.sns.domain.like.repository.LikeRepository;
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.order.model.Order;
+import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.repository.LikeRepository;
 import com.postype.sns.domain.order.model.Point;
-import com.postype.sns.domain.post.repository.PostRepository;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter
