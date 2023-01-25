@@ -11,6 +11,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByMemberId(String memberId);
-	@Query(nativeQuery = true, value="SELECT * FROM MEMBER as m where m.id in (:ids)")
-	List<Member> findAllByIn(@Param("ids") List<Long> ids);
 }

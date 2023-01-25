@@ -11,6 +11,8 @@ import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.application.contoller.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,5 +36,9 @@ public class OrderService {
 	public OrderDto findByMemberIdAndPostId(MemberDto member, PostDto post) {
 		Order order = orderRepository.findByMemberIdAndPostId(member.getId(), post.getId());
 		return OrderDto.fromEntity(order);
+	}
+
+	public Page<OrderDto> findAllByMember(MemberDto member, Pageable pageable) {
+		return orderRepository.findAllByMember(member, pageable);
 	}
 }

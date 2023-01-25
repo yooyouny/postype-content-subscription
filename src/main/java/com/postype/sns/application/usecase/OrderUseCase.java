@@ -7,6 +7,8 @@ import com.postype.sns.domain.order.service.OrderService;
 import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,14 @@ public class OrderUseCase {
 		return orderService.create(member, post);
 	}
 
-	public OrderDto getOrder(String memberId, Long postId){
+	public OrderDto getOrderByMemberAndPost(String memberId, Long postId){
 		MemberDto member = memberService.getMember(memberId);
 		PostDto post = postService.getPost(postId);
 		return orderService.findByMemberIdAndPostId(member, post);
 	}
 
+	public Page<OrderDto> getOrder(String memberId, Pageable pageable) {
+		MemberDto member = memberService.getMember(memberId);
+		return orderService.findAllByMember(member, pageable);
+	}
 }

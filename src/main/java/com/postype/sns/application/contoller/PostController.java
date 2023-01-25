@@ -13,7 +13,6 @@ import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.domain.post.service.PostService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,8 +65,8 @@ public class PostController {
 	}
 
 	@GetMapping("/member/timeline")
-	public PageCursor<Post> getTimeLine(Authentication authentication, CursorRequest request){
-		return timeLinePostsUseCase.executeTimeLine(authentication.getName(), request);
+	public Response<PageCursor<Post>> getTimeLine(Authentication authentication, CursorRequest request){
+		return Response.success(timeLinePostsUseCase.executeTimeLine(authentication.getName(), request));
 	}
 
 	@PostMapping("{postId}/likes")
@@ -82,8 +81,8 @@ public class PostController {
 	}
 
 	@GetMapping("/likes")
-	public Response<List<PostDto>> getLikePosts(Authentication authentication){
-		return Response.success(postService.getLikePosts(authentication.getName()));
+	public Response<Page<PostResponse>> getLikePosts(Authentication authentication, Pageable pageable){
+		return Response.success(postService.getLikeByMember(authentication.getName(), pageable).map(PostResponse::fromPostDto));
 	}
 
 	@PostMapping("{postId}/comments")

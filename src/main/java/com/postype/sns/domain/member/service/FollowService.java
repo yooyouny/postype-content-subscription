@@ -11,6 +11,8 @@ import com.postype.sns.domain.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,8 +27,6 @@ public class FollowService {
 		if(fromMember.getId() == toMember.getId())
 			throw new ApplicationException(ErrorCode.MEMBER_IS_SAME, String.format(" %s is same", fromMember.getMemberId()));
 
-		log.error(fromMember.getId() + " " + toMember.getId());
-
 		memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
 			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -34,17 +34,18 @@ public class FollowService {
 		return FollowDto.fromEntity(savedFollow);
 	}
 
-	public List<FollowDto> getFollowList(MemberDto fromMember) {
-		Member member = memberRepository.findByMemberId(fromMember.getMemberId()).orElseThrow(()
-			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
-
-		return followRepository.findByFromMemberId(member.getId()).stream().map(
-			FollowDto::fromEntity).toList();
+	public Page<FollowDto> getFollowList(MemberDto fromMember, Pageable pageable) {
+		Member member = getMemberOrException(fromMember.getMemberId());
+		return followRepository.findAllByFromMemberId(member.getId(), pageable).map(FollowDto::fromEntity);
 	}
 	//해당 멤버를 팔로잉 하고 있는 멤버들의 목록을 반환
 	public List<FollowDto> getFollowers(MemberDto toMember){
-		Member member = memberRepository.findByMemberId(toMember.getMemberId()).orElseThrow(()
-			-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
-		return followRepository.findByToMemberId(toMember.getId()).stream().map(FollowDto::fromEntity).toList();
+		Member member = getMemberOrException(toMember.getMemberId());
+		return followRepository.findByToMemberId(member.getId()).stream().map(FollowDto::fromEntity).toList();
+	}
+
+	private Member getMemberOrException(String memberId){
+		return memberRepository.findByMemberId(memberId).orElseThrow(() ->
+			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
 	}
 }

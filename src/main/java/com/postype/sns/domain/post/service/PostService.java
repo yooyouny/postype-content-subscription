@@ -122,14 +122,13 @@ public class PostService{
 		return likeRepository.countByPost(post.getId());
 	}
 
-	public List<PostDto> getLikePosts(String memberId) {
+	public Page<PostDto> getLikeByMember(String memberId, Pageable pageable) {
 		Member member = getMemberOrException(memberId);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
 		List<Post> postList = likedList.stream().map(Like::getPost).toList();
 
-		return postRepository.findAllByInId(postList.stream().map(Post::getId).toList())
-			.stream().map(PostDto::fromPost).toList();
+		return postRepository.findAllByMember(postList.stream().map(Post::getId).toList(), pageable).map(PostDto::fromPost);
 	}
 
 	@Transactional

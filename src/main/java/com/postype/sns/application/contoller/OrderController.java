@@ -7,6 +7,8 @@ import com.postype.sns.application.usecase.OrderUseCase;
 import com.postype.sns.domain.order.model.Order;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +34,13 @@ public class OrderController {
 	@GetMapping("/{postId}")
 	public Response<OrderResponse> getOrderByMemberAndPost(Authentication authentication, @PathVariable Long postId){
 		return Response.success(
-			OrderResponse.fromDto(OrderUseCase.getOrder(authentication.getName(), postId)));
+			OrderResponse.fromDto(OrderUseCase.getOrderByMemberAndPost(authentication.getName(), postId)));
+	}
+
+	@GetMapping
+	public Response<Page<OrderResponse>> getOrder(Authentication authentication, Pageable pageable){
+		return Response.success(
+			OrderUseCase.getOrder(authentication.getName(), pageable).map(OrderResponse::fromDto));
 	}
 
 }

@@ -36,10 +36,6 @@ public class MemberService {
 		return MemberDto.fromEntity(member);
 	}
 
-	public List<MemberDto> getMembers(List<Long> ids){
-		return memberRepository.findAllByIn(ids).stream().map(MemberDto::fromEntity).toList();
-	}
-
 	@Transactional
 	public MemberDto register(String memberId, String password, String memberName, String email) {
 
