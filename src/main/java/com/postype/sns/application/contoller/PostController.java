@@ -1,7 +1,9 @@
 package com.postype.sns.application.contoller;
 
+import com.postype.sns.application.contoller.dto.request.PostCommentRequest;
 import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
+import com.postype.sns.application.contoller.dto.response.CommentResponse;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
 import com.postype.sns.application.usecase.CreatePostUseCase;
@@ -9,7 +11,7 @@ import com.postype.sns.application.usecase.TimeLinePostsUseCase;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.domain.post.model.PostDto;
+import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +84,17 @@ public class PostController {
 	@GetMapping("/likes")
 	public Response<List<PostDto>> getLikePosts(Authentication authentication){
 		return Response.success(postService.getLikePosts(authentication.getName()));
+	}
+
+	@PostMapping("{postId}/comments")
+	public Response<Void> comment(@PathVariable Long postId, @RequestBody PostCommentRequest request, Authentication authentication){
+		postService.comment(postId, authentication.getName(), request.getComment());
+		return Response.success();
+	}
+
+	@GetMapping("{postId}/comments")
+	public Response<Page<CommentResponse>> getComment(@PathVariable Long postId, Pageable pageable){
+		return Response.success(postService.getComment(postId, pageable).map(CommentResponse::fromDto));
 	}
 
 

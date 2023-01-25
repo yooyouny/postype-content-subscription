@@ -1,6 +1,7 @@
-package com.postype.sns.domain.member.model;
+package com.postype.sns.application.contoller.dto;
 
 import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.entity.MemberRole;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;

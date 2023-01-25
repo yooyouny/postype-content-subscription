@@ -11,7 +11,7 @@ import com.postype.sns.application.contoller.dto.request.MemberLoginRequest;
 import com.postype.sns.application.contoller.dto.request.MemberRegisterRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,6 @@
-package com.postype.sns.domain.member.model;
+package com.postype.sns.application.contoller.dto;
 
 import com.postype.sns.domain.member.model.entity.Follow;
-import com.postype.sns.domain.member.model.entity.Member;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.postype.sns.application.contoller.dto.response;
 
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.MemberRole;
+import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.domain.member.model.entity.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

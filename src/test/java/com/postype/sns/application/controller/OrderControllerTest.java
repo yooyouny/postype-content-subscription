@@ -7,14 +7,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
-import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.model.entity.Member;
-import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.domain.order.model.Order;
-import com.postype.sns.domain.order.model.OrderDto;
+import com.postype.sns.application.contoller.dto.OrderDto;
 import com.postype.sns.domain.order.service.OrderService;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.domain.post.model.PostDto;
+import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;
 import org.junit.jupiter.api.DisplayName;
