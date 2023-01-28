@@ -1,42 +1,63 @@
 package com.postype.sns.domain.post.service;
 
+import com.postype.sns.application.contoller.dto.AlarmDto;
 import com.postype.sns.application.contoller.dto.CommentDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.domain.member.model.Alarm;
+import com.postype.sns.domain.member.model.AlarmArgs;
+import com.postype.sns.domain.member.model.AlarmType;
+import com.postype.sns.domain.member.model.Follow;
+import com.postype.sns.domain.member.repository.AlarmRepository;
+import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.post.model.Comment;
 import com.postype.sns.domain.post.model.Like;
 import com.postype.sns.domain.post.repository.CommentRepository;
 import com.postype.sns.domain.post.repository.LikeRepository;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
+import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService{
 
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
+	private final FollowRepository followRepository;
 	private final LikeRepository likeRepository;
 	private final CommentRepository commentRepository;
+	private final AlarmRepository alarmRepository;
 
 	@Transactional
 	public Long create(String title, String body, String memberId, int price){
 		//user find
-		Member foundedMember = getMemberOrException(memberId);
+		Member writer = getMemberOrException(memberId);
 		//post save
-		return postRepository.save(Post.of(title, body, foundedMember, price)).getId();
+		Long savedPostId = postRepository.save(Post.of(title, body, writer, price)).getId();
+		//Member following writer
+		List<Member> followingList = followRepository.findAllByToMemberId(writer.getId()).stream().map(
+			Follow::getFromMember).toList();
+		//alarm save
+		alarmRepository.saveAll(getAlarmList(followingList, writer, savedPostId));
+
+		return savedPostId;
 	}
+
+
 
 	@Transactional
 	public PostDto modify(String title, String body, String memberId, Long postId){
@@ -63,7 +84,8 @@ public class PostService{
 		if(post.getMember() != foundedMember){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
 		}
-
+		likeRepository.deleteAllByPost(post);
+		commentRepository.deleteAllByPost(post);
 		postRepository.delete(post);
 	}
 
@@ -113,13 +135,22 @@ public class PostService{
 			throw new ApplicationException(ErrorCode.ALREADY_LIKE,
 				String.format("memberName %s already like post %d", memberId, postId));
 		});
+
+		//like save
 		likeRepository.save(Like.of(member, post));
+
+		//alarm save
+		alarmRepository.save(Alarm.of(post.getMember(), //알람을 받는 포스트 작성자에게 알람 전송
+			AlarmType.NEW_LIKE_ON_POST,
+			new AlarmArgs(member.getId(), // 알람을 발생시킨 좋아요를 누른 사람의 아이디
+				 "Like", post.getId())// 알람이 발생한 포스트의 아이디
+			)
+		);
 	}
 
-	public int getLikeCount(Long postId) {
+	public long getLikeCount(Long postId) {
 		Post post = getPostOrException(postId);
-
-		return likeRepository.countByPost(post.getId());
+		return likeRepository.countByPost(post);
 	}
 
 	public Page<PostDto> getLikeByMember(String memberId, Pageable pageable) {
@@ -137,7 +168,15 @@ public class PostService{
 		Post post = getPostOrException(postId);
 
 		//comment save
-		commentRepository.save(Comment.of(member, post, comment));
+		Comment cmt = commentRepository.save(Comment.of(member, post, comment));
+
+		//alarm save
+		alarmRepository.save(Alarm.of(post.getMember(), //알람을 받는 포스트 작성자에게 알람 전송
+				AlarmType.NEW_COMMENT_ON_POST,
+				new AlarmArgs(member.getId(), //알람이 발생을 발생시킨 코멘트를 작성한 사람의 아이디
+					"Comment", cmt.getId()) //알람이 발생한 코멘트의 아이디
+			)
+		);
 	}
 
 	public Page<CommentDto> getComment(Long postId, Pageable pageable){
@@ -151,5 +190,19 @@ public class PostService{
 	private Member getMemberOrException(String memberId){
 		return memberRepository.findByMemberId(memberId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
+	}
+	private List<Alarm> getAlarmList(List<Member> followedList, Member writer, Long postId) {
+		List<Alarm> alarmList = new ArrayList<>();
+		for(int i=0; i< followedList.size(); i++){
+			Member followingMember = followedList.get(i);
+			alarmList.add(Alarm.of(followingMember,//알람을 받을 작성자를 구독하고 있는 사람
+				AlarmType.NEW_POST_ON_SUBSCRIBER,
+				new AlarmArgs(writer.getId(), //알람을 발생시킨 작성자의 아이디
+					"Post",	postId) //알람을 발생시킨 포스트의 아이디
+				)
+			);
+		}
+		log.error(String.valueOf(alarmList.size()));
+		return alarmList;
 	}
 }

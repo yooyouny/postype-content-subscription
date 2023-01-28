@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.MemberDto;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.order.model.Order;
 import com.postype.sns.application.contoller.dto.OrderDto;
 import com.postype.sns.domain.order.service.OrderService;

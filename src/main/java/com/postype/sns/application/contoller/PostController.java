@@ -55,7 +55,7 @@ public class PostController {
 	}
 
 	@GetMapping //TODO :: 오프셋 기반 좋아요 순 으로 정렬 limit 30 size 10
-	public Response<Page<PostResponse>> getPostList(Pageable pageable, Authentication authentication){
+	public Response<Page<PostResponse>> getPostList(Pageable pageable){
 		return Response.success(postService.getList(pageable).map(PostResponse::fromPostDto));
 	}
 
@@ -76,7 +76,7 @@ public class PostController {
 	}
 
 	@GetMapping("{postId}/likes")
-	public Response<Integer> getLike(@PathVariable Long postId){
+	public Response<Long> getLike(@PathVariable Long postId){
 		return Response.success(postService.getLikeCount(postId));
 	}
 

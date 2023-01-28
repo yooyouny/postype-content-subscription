@@ -10,16 +10,13 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class PostDto {
 
-	private static final LikeRepository likeRepository = null;
 	private Long id;
 	private String title;
 	private String body;
 	private MemberDto member;
-	private Point price;
-	private Integer likeCount;
+	private int price;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
@@ -31,8 +28,7 @@ public class PostDto {
 			post.getTitle(),
 			post.getBody(),
 			MemberDto.fromEntity(post.getMember()),
-			post.getPrice(),
-			likeRepository.countByPost(post.getId()),
+			post.getPrice().getValue(),
 			post.getRegisteredAt(),
 			post.getUpdatedAt(),
 			post.getDeletedAt()

@@ -10,7 +10,7 @@ import com.postype.sns.domain.post.model.Comment;
 import com.postype.sns.domain.post.model.Like;
 import com.postype.sns.domain.post.repository.CommentRepository;
 import com.postype.sns.domain.post.repository.LikeRepository;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.repository.PostRepository;

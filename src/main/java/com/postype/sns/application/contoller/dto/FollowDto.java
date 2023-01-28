@@ -1,6 +1,6 @@
 package com.postype.sns.application.contoller.dto;
 
-import com.postype.sns.domain.member.model.entity.Follow;
+import com.postype.sns.domain.member.model.Follow;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,8 +18,8 @@ public class FollowDto {
 	public static FollowDto fromEntity(Follow follow){
 		return new FollowDto(
 			follow.getId(),
-			follow.getFromMemberId(),
-			follow.getToMemberId(),
+			follow.getFromMember().getId(),
+			follow.getToMember().getId(),
 			follow.getRegisteredAt(),
 			follow.getUpdatedAt(),
 			follow.getDeletedAt()
