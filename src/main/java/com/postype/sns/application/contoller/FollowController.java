@@ -26,10 +26,9 @@ public class FollowController {
 
 	@PostMapping("/{toMemberName}")
 	public Response<FollowResponse> create(Authentication authentication, @PathVariable String toMemberName){
-		var fromMember = memberService.getMember(authentication.getName());
-		var toMember = memberService.getMember(toMemberName);
-		FollowDto dto = followService.create(fromMember, toMember);
-
+		MemberDto fromMember = memberService.getMember(authentication.getName());
+		MemberDto toMember = memberService.getMember(toMemberName);
+		FollowDto dto = followService.create(fromMember.getId(), toMember.getMemberId());
 		return Response.success(FollowResponse.fromFollowDto(dto));
 	}
 

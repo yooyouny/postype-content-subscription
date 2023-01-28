@@ -1,16 +1,17 @@
-package com.postype.sns.domain.post.model;
+package com.postype.sns.domain.member.model;
 
-import com.postype.sns.application.contoller.dto.PostDto;
-import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.order.model.Point;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
@@ -19,28 +20,35 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Table(name = "\"post\"")
+@Table(name = "\"alarm\"", indexes = {
+	@Index(name = "member_id_idx", columnList = "member_id")
+})
 @Getter
 @Setter
+@TypeDef(name = "json", typeClass = JsonType.class)
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
+@SQLDelete(sql = "UPDATE alarm SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Post {
+public class Alarm {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String title;
-	@Column(columnDefinition = "TEXT")
-	private String body;
+	//알람을 받는 사람에 대한 정보
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name= "member_id")
+	@JoinColumn(name = "member_id")
 	private Member member;
-	@Column(name="price")
-	private Point price;
+	@Enumerated(EnumType.STRING)
+	private AlarmType alarmType;
+	@Type(type = "json")
+	@Column(columnDefinition = "json")
+	private AlarmArgs alarmArgs;
 	@Column(name = "register_at")
 	private Timestamp registeredAt;
 	@Column(name = "updated_at")
@@ -58,26 +66,12 @@ public class Post {
 		this.updatedAt = Timestamp.from(Instant.now());
 	}
 
-	public static Post of(String title, String body, Member member, int price){
-		Post post = new Post();
-		post.setTitle(title);
-		post.setBody(body);
-		post.setMember(member);
-		post.setPrice(new Point(price));
-		return post;
-	}
-
-	public static Post of(PostDto dto){
-		Post post = new Post();
-		post.setId(dto.getId());
-		post.setTitle(dto.getTitle());
-		post.setBody(dto.getBody());
-		post.setMember(Member.of(dto.getMember()));
-		post.setPrice(new Point(dto.getPrice()));
-		post.setRegisteredAt(dto.getRegisteredAt());
-		post.setUpdatedAt(dto.getUpdatedAt());
-		post.setDeletedAt(dto.getDeletedAt());
-		return post;
+	public static Alarm of(Member member, AlarmType type, AlarmArgs args){
+		Alarm alarm = new Alarm();
+		alarm.setMember(member);
+		alarm.setAlarmType(type);
+		alarm.setAlarmArgs(args);
+		return alarm;
 	}
 
 }
