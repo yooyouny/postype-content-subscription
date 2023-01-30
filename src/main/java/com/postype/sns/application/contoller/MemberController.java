@@ -10,6 +10,7 @@ import com.postype.sns.application.contoller.dto.response.MemberRegisterResponse
 import com.postype.sns.application.contoller.dto.response.Response;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.exception.ErrorCode;
+import com.postype.sns.domain.member.service.AlarmService;
 import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.utill.ClassUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
 	private final MemberService memberService;
+
+	private final AlarmService alarmService;
 
 	@PostMapping("/register")
 	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
@@ -47,6 +51,13 @@ public class MemberController {
 			() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to MemberDto is failed"));
 		return Response.success(memberService.getAlarmList(memberDto.getId(), pageable).map(
 			AlarmResponse::fromDto));
+	}
+
+	@GetMapping("/alarm/subscribe")
+	public SseEmitter subscribe(Authentication authentication){
+		MemberDto memberDto = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), MemberDto.class).orElseThrow(
+			() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to MemberDto is failed"));
+		return alarmService.connectAlarm(memberDto.getId());
 	}
 
 }

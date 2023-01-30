@@ -6,7 +6,7 @@ import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.contoller.dto.response.CommentResponse;
 import com.postype.sns.application.contoller.dto.response.PostResponse;
 import com.postype.sns.application.contoller.dto.response.Response;
-import com.postype.sns.application.usecase.CreatePostUseCase;
+import com.postype.sns.application.usecase.PostUseCase;
 import com.postype.sns.application.usecase.TimeLinePostsUseCase;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
@@ -33,7 +33,7 @@ public class PostController {
 
 	private final PostService postService;
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
-	private final CreatePostUseCase createPostUseCase;
+	private final PostUseCase createPostUseCase;
 
 
 	@PostMapping

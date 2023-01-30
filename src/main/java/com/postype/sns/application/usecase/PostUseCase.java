@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CreatePostUseCase {
+public class PostUseCase {
 
 	private final PostService postService;
 	private final FollowService followService;

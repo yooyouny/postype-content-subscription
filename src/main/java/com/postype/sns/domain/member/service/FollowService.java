@@ -6,12 +6,14 @@ import com.postype.sns.application.contoller.dto.FollowDto;
 import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.model.Alarm;
 import com.postype.sns.domain.member.model.AlarmArgs;
+import com.postype.sns.domain.member.model.AlarmEvent;
 import com.postype.sns.domain.member.model.AlarmType;
 import com.postype.sns.domain.member.model.Follow;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.AlarmRepository;
 import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;
+import com.postype.sns.producer.AlarmProducer;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +29,8 @@ public class FollowService {
 
 	private final FollowRepository followRepository;
 	private final MemberRepository memberRepository;
-
 	private final AlarmRepository alarmRepository;
+	private final AlarmProducer alarmProducer;
 
 	@Transactional
 	public FollowDto create(Long fromMemberId, String toMemberName) {
@@ -43,11 +45,11 @@ public class FollowService {
 		//follow save
 		Follow follow = followRepository.save(Follow.of(fromMember, toMember));
 
-		//alarm save
-		alarmRepository.save(Alarm.of(toMember, //알람 받을 사람
-			AlarmType.NEW_SUBSCRIBE_ON_MEMBER,
-			new AlarmArgs(fromMember.getId(), //알람을 발생시킨 구독 버튼을 누른 사람
-				"Follow", follow.getId())) //알람을 발생시킨 팔로우 아이디
+		alarmProducer.send(new AlarmEvent(toMember.getId(), //알람을 받는 팔로 대상자의 아이디
+				AlarmType.NEW_SUBSCRIBE_ON_MEMBER,
+				new AlarmArgs(fromMember.getId(), // 알람을 발생시킨 팔로 요청자의 아이디
+					"Follow", follow.getId())// 알람이 발생한 팔로우의 아이디
+			)
 		);
 
 		return FollowDto.fromEntity(follow);
