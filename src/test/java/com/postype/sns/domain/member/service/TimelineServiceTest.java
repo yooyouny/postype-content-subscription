@@ -5,15 +5,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.postype.sns.application.usecase.TimeLinePostsUseCase;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
-import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.model.TimeLine;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.domain.post.repository.TimeLineRepository;
-import com.postype.sns.domain.post.service.TimeLineService;
 import com.postype.sns.fixture.PostFixture;
 import com.postype.sns.fixture.TimeLineFixture;
 import java.util.ArrayList;
@@ -25,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class TimelineServiceTest {
@@ -55,13 +54,14 @@ public class TimelineServiceTest {
 
 		TimeLine timeLine = TimeLineFixture.get(id, postId);
 		Post post = PostFixture.get(memberId, postId, id);
+		Pageable pageable = mock(Pageable.class);
 
 		//mocking
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
 		List<TimeLine> timelines = new ArrayList<>();
 		when(timeLineRepository.findAllByMemberIdAndOrderByIdDesc(1L, 10)).thenReturn(
 			(List.of(timeLine)));
-		when(postRepository.findAllByInId(ids)).thenReturn(List.of(post));
+		when(postRepository.findAllByInId(ids)).thenReturn((List<Post>) mock(Post.class));
 
 		Assertions.assertDoesNotThrow(() -> timeLinePostsUseCase.executeTimeLine(memberId,
 			mock(CursorRequest.class)));

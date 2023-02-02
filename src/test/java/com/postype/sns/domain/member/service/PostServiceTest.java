@@ -4,13 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.post.model.Comment;
 import com.postype.sns.domain.post.model.Like;
 import com.postype.sns.domain.post.repository.CommentRepository;
 import com.postype.sns.domain.post.repository.LikeRepository;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.domain.post.repository.PostRepository;
@@ -207,7 +208,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
 		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.getMyPostList("", pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getMyPostList(MemberDto.fromEntity(member), pageable));
 	}
 
 	@Test
@@ -278,13 +279,14 @@ public class PostServiceTest {
 
 		//mocking
 		Post post = PostFixture.get(memberId, postId, 1L);
+		MemberDto memberDto = mock(MemberDto.class);
 		Member member = post.getMember();
 
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 		when(commentRepository.save(Comment.of(member, post, comment))).thenReturn(mock(Comment.class));
 
-		Assertions.assertDoesNotThrow(() -> postService.comment(postId, memberId, comment));
+		Assertions.assertDoesNotThrow(() -> postService.comment(postId, memberDto, comment));
 	}
 
 	@Test
@@ -305,6 +307,8 @@ public class PostServiceTest {
 			ApplicationException.class, () -> postService.like(postId, memberId));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
+
+
 
 
 

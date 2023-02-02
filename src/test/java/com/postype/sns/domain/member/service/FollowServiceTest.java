@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.contoller.dto.MemberDto;
-import com.postype.sns.domain.member.model.entity.Follow;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Follow;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.fixture.MemberFixture;
@@ -33,7 +33,6 @@ public class FollowServiceTest {
 	@Test
 	@WithMockUser
 	@DisplayName("팔로우 성공 테스트")
-	//왜 null pointer 에러 나는지 모르겠음 ㅜㅜ
 	void createFollowSuccess(){
 		String toMemberId = "toMember";
 		String fromMemberId = "fromMember";
@@ -43,9 +42,9 @@ public class FollowServiceTest {
 
 		when(memberRepository.findByMemberId(fromMemberId)).thenReturn(Optional.of(fromMember));
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.of(toMember));
-		when(followrepository.save(Follow.of(fromMember.getId(), toMember.getId()))).thenReturn(mock(Follow.class));
+		when(followrepository.save(Follow.of(fromMember, toMember))).thenReturn(mock(Follow.class));
 
-		Assertions.assertDoesNotThrow(() -> followService.create(MemberDto.fromEntity(fromMember), MemberDto.fromEntity(toMember)));
+		Assertions.assertDoesNotThrow(() -> followService.create(fromMember.getId(), toMember.getMemberId()));
 	}
 
 	@Test
@@ -62,7 +61,7 @@ public class FollowServiceTest {
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> followService.create(MemberDto.fromEntity(toMember), MemberDto.fromEntity(fromMember)));
+			ApplicationException.class, () -> followService.create(toMember.getId(), fromMember.getMemberId()));
 		Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND, e.getErrorCode());
 	}
 
@@ -80,7 +79,7 @@ public class FollowServiceTest {
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.of(toMember));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> followService.create(MemberDto.fromEntity(toMember), MemberDto.fromEntity(fromMember)));
+			ApplicationException.class, () -> followService.create(toMember.getId(), fromMember.getMemberId()));
 		Assertions.assertEquals(ErrorCode.MEMBER_IS_SAME, e.getErrorCode());
 	}
 

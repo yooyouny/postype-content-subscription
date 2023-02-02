@@ -12,26 +12,19 @@ import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.domain.post.service.TimeLineService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class TimeLinePostsUseCase {
-	final private FollowService followService;
 	final private PostService postService;
 	final private MemberService memberService;
 	final private TimeLineService timeLineService;
 
-	public PageCursor<Post> execute(String memberId, CursorRequest request){ //pull model
-		MemberDto member = memberService.getMember(memberId);
-		List<FollowDto> followings = followService.getFollowList(member);
-		List<Long> followingMemberIds = followings.stream().map(FollowDto::getToMemberId).toList();
-		return postService.getTimeLinePosts(followingMemberIds, request);
-	}
-
-	public PageCursor<Post> executeTimeLine(String memberId, CursorRequest request){//push
-		MemberDto member = memberService.getMember(memberId);
-		PageCursor<TimeLine> pagedTimeLines = timeLineService.getTimeLine(member.getId(), request); //왜 페이지 커서에 담아야하지?
+	public PageCursor<Post> executeTimeLine(MemberDto member, CursorRequest request){//push
+		PageCursor<TimeLine> pagedTimeLines = timeLineService.getTimeLine(member.getId(), request);
 		List<Long> postIds = pagedTimeLines.contents().stream().map(TimeLine::getPostId).toList();
 		List<Post> posts = postService.getPostsByIds(postIds);
 		return new PageCursor(pagedTimeLines.nextCursorRequest(), posts);

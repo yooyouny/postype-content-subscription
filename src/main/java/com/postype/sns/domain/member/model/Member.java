@@ -1,4 +1,4 @@
-package com.postype.sns.domain.member.model.entity;
+package com.postype.sns.domain.member.model;
 
 import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.order.model.Order;
@@ -70,8 +70,7 @@ public class Member {
 		member.setEmail(email);
 		return member;
 	}
-
-	public static Member of(MemberDto dto){
+	public static Member toDto(MemberDto dto){
 		Member member = new Member();
 		member.setId(dto.getId());
 		member.setMemberId(dto.getMemberId());
