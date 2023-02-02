@@ -22,13 +22,13 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 
-	public OrderDto create(MemberDto member, PostDto post){
-		orderRepository.findAllByMemberIdAndPostId(member.getId(), post.getId()).ifPresent(it -> {
+	public OrderDto create(MemberDto memberDto, PostDto post){
+		orderRepository.findAllByMemberIdAndPostId(memberDto.getId(), post.getId()).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.ALREADY_ORDER,
-				String.format("%s already ordered this post", member.getMemberId()));
+				String.format("%s already ordered this post", memberDto.getMemberId()));
 		});
-
-		Order order = orderRepository.save(Order.of(Member.of(member), Post.of(post)));
+		Member member = Member.toDto(memberDto);
+		Order order = orderRepository.save(Order.of(member, Post.of(post)));
 
 		return OrderDto.fromEntity(order);
 	}

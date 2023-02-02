@@ -22,5 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	@Query(nativeQuery = true, value = "SELECT * FROM POST as p WHERE p.member_id in :memberIds AND p.id < :id ORDER BY p.id desc LIMIT :size")
 	List<Post> findAllByLessThanIdAndInMemberIdsAndOrderByIdDesc(@Param("id") Long id, @Param("memberIds") List<Long> memberIds, @Param("size") int size);
 	@Query(nativeQuery = true, value = "SELECT * FROM POST as p WHERE p.id in :ids")
-	Page<Post> findAllByMember(List<Long> ids, Pageable pageable);
+	Page<Post> findAllByMember(@Param("ids") List<Long> ids, Pageable pageable);
+
 }

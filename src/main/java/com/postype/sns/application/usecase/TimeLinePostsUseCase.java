@@ -23,8 +23,7 @@ public class TimeLinePostsUseCase {
 	final private MemberService memberService;
 	final private TimeLineService timeLineService;
 
-	public PageCursor<Post> executeTimeLine(String memberId, CursorRequest request){//push
-		MemberDto member = memberService.getMember(memberId);
+	public PageCursor<Post> executeTimeLine(MemberDto member, CursorRequest request){//push
 		PageCursor<TimeLine> pagedTimeLines = timeLineService.getTimeLine(member.getId(), request);
 		List<Long> postIds = pagedTimeLines.contents().stream().map(TimeLine::getPostId).toList();
 		List<Post> posts = postService.getPostsByIds(postIds);
