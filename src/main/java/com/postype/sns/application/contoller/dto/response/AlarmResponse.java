@@ -31,6 +31,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 @AllArgsConstructor
+@Getter
 public class AlarmResponse {
 	private Long id;
 	private AlarmType alarmType;

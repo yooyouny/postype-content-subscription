@@ -24,20 +24,17 @@ public class OrderUseCase {
 	private final OrderService orderService;
 
 	@Transactional
-	public OrderDto create(String memberId, Long postId){
-		MemberDto member = memberService.getMember(memberId);
+	public OrderDto create(MemberDto member, Long postId){
 		PostDto post = postService.getPost(postId);
 		return orderService.create(member, post);
 	}
 
-	public OrderDto getOrderByMemberAndPost(String memberId, Long postId){
-		MemberDto member = memberService.getMember(memberId);
+	public OrderDto getOrderByMemberAndPost(MemberDto member, Long postId){
 		PostDto post = postService.getPost(postId);
 		return orderService.findByMemberIdAndPostId(member, post);
 	}
 
-	public Page<OrderDto> getOrder(String memberId, Pageable pageable) {
-		MemberDto member = memberService.getMember(memberId);
+	public Page<OrderDto> getOrder(MemberDto member, Pageable pageable) {
 		return orderService.findAllByMember(member, pageable);
 	}
 }

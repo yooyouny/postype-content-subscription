@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,17 +47,13 @@ public class MemberController {
 	}
 
 	@GetMapping("/alarm")
-	public Response<Page<AlarmResponse>> getAlarm(Authentication authentication, Pageable pageable){
-		MemberDto memberDto = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), MemberDto.class).orElseThrow(
-			() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to MemberDto is failed"));
+	public Response<Page<AlarmResponse>> getAlarm(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(memberService.getAlarmList(memberDto.getId(), pageable).map(
 			AlarmResponse::fromDto));
 	}
 
 	@GetMapping("/alarm/subscribe")
-	public SseEmitter subscribe(Authentication authentication){
-		MemberDto memberDto = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), MemberDto.class).orElseThrow(
-			() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to MemberDto is failed"));
+	public SseEmitter subscribe(@AuthenticationPrincipal MemberDto memberDto){
 		return alarmService.connectAlarm(memberDto.getId());
 	}
 

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,21 +31,21 @@ public class OrderController {
 	private final OrderUseCase OrderUseCase;
 
 	@PostMapping("/{postId}")
-	public Response<OrderResponse> create(Authentication authentication, @PathVariable Long postId){
+	public Response<OrderResponse> create(@AuthenticationPrincipal MemberDto memberDto, @PathVariable Long postId){
 		return Response.success(
-			OrderResponse.fromDto(OrderUseCase.create(authentication.getName(), postId)));
+			OrderResponse.fromDto(OrderUseCase.create(memberDto, postId)));
 	}
 
 	@GetMapping("/{postId}")
-	public Response<OrderResponse> getOrderByMemberAndPost(Authentication authentication, @PathVariable Long postId){
+	public Response<OrderResponse> getOrderByMemberAndPost(@AuthenticationPrincipal MemberDto memberDto, @PathVariable Long postId){
 		return Response.success(
-			OrderResponse.fromDto(OrderUseCase.getOrderByMemberAndPost(authentication.getName(), postId)));
+			OrderResponse.fromDto(OrderUseCase.getOrderByMemberAndPost(memberDto, postId)));
 	}
 
 	@GetMapping
-	public Response<Page<OrderResponse>> getOrder(Authentication authentication, Pageable pageable){
+	public Response<Page<OrderResponse>> getOrder(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(
-			OrderUseCase.getOrder(authentication.getName(), pageable).map(OrderResponse::fromDto));
+			OrderUseCase.getOrder(memberDto, pageable).map(OrderResponse::fromDto));
 	}
 
 

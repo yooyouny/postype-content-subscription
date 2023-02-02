@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.postype.sns.application.contoller.dto.AlarmDto;
 import com.postype.sns.application.contoller.dto.CommentDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.member.model.Alarm;
@@ -50,9 +51,9 @@ public class PostService{
 
 
 	@Transactional
-	public Long create(String title, String body, String memberId, int price){
+	public Long create(String title, String body, MemberDto memberDto, int price){
 		//user find
-		Member writer = getMemberOrException(memberId);
+		Member writer = Member.toDto(memberDto);
 		//post save
 		Long savedPostId = postRepository.save(Post.of(title, body, writer, price)).getId();
 		//Member following writer
@@ -72,15 +73,15 @@ public class PostService{
 	}
 
 	@Transactional
-	public PostDto modify(String title, String body, String memberId, Long postId){
+	public PostDto modify(String title, String body, MemberDto memberDto, Long postId){
 		//user find
-		Member foundedMember = getMemberOrException(memberId);
+		Member foundedMember = Member.toDto(memberDto);
 		//post exist
 		Post post = getPostOrException(postId);
 
 		//post permission
 		if(post.getMember() != foundedMember){
-			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
 		}
 
 		post.setTitle(title);
@@ -88,13 +89,13 @@ public class PostService{
 		return PostDto.fromPost(postRepository.saveAndFlush(post));
 	}
 	@Transactional
-	public void delete(String memberId, Long postId){
+	public void delete(MemberDto memberDto, Long postId){
 		//user find
-		Member foundedMember = getMemberOrException(memberId);
+		Member foundedMember = Member.toDto(memberDto);
 		Post post = getPostOrException(postId);
 
 		if(post.getMember() != foundedMember){
-			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", memberId, postId));
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
 		}
 		likeRepository.deleteAllByPost(post);
 		commentRepository.deleteAllByPost(post);
@@ -106,10 +107,8 @@ public class PostService{
 	}
 
 	//내가 쓴 글 읽기
-	public Page<PostDto> getMyPostList (String memberId, Pageable pageable){
-
-		Member member = getMemberOrException(memberId);
-		return postRepository.findAllByMemberId(member.getId(), pageable).map(PostDto::fromPost);
+	public Page<PostDto> getMyPostList (MemberDto memberDto, Pageable pageable){
+		return postRepository.findAllByMemberId(memberDto.getId(), pageable).map(PostDto::fromPost);
 	}
 
 	public List<Post> getPostsByIds(List<Long> ids){
@@ -138,14 +137,14 @@ public class PostService{
 	}
 
 	@Transactional
-	public void like(Long postId, String memberId){
-		Member member = getMemberOrException(memberId);
+	public void like(Long postId, MemberDto memberDto){
 		Post post = getPostOrException(postId);
+		Member member = Member.toDto(memberDto);
 
 		//check like
 		likeRepository.findByMemberAndPost(member, post).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.ALREADY_LIKE,
-				String.format("memberName %s already like post %d", memberId, postId));
+				String.format("memberName %s already like post %d", member.getMemberId(), postId));
 		});
 
 		//like save
@@ -164,8 +163,8 @@ public class PostService{
 		return likeRepository.countByPost(post);
 	}
 
-	public Page<PostDto> getLikeByMember(String memberId, Pageable pageable) {
-		Member member = getMemberOrException(memberId);
+	public Page<PostDto> getLikeByMember(MemberDto memberDto, Pageable pageable) {
+		Member member = Member.toDto(memberDto);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
 		List<Post> postList = likedList.stream().map(Like::getPost).toList();
@@ -174,8 +173,8 @@ public class PostService{
 	}
 
 	@Transactional
-	public void comment(Long postId, String memberId, String comment){
-		Member member = getMemberOrException(memberId);
+	public void comment(Long postId, MemberDto memberDto, String comment){
+		Member member = Member.toDto(memberDto);
 		Post post = getPostOrException(postId);
 
 		//comment save

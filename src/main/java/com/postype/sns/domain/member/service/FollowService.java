@@ -33,13 +33,12 @@ public class FollowService {
 	private final AlarmProducer alarmProducer;
 
 	@Transactional
-	public FollowDto create(Long fromMemberId, String toMemberName) {
+	public FollowDto create(MemberDto fromMemberDto, MemberDto toMemberDto) {
 
-		Member toMember = getMemberOrException(toMemberName);
-		Member fromMember = memberRepository.findById(fromMemberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		Member toMember = Member.toDto(toMemberDto);
+		Member fromMember = Member.toDto(fromMemberDto);
 
-		if(fromMemberId == toMember.getId())
+		if(fromMember.getId() == toMember.getId())
 			throw new ApplicationException(ErrorCode.MEMBER_IS_SAME);
 
 		//follow save

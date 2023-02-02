@@ -1,6 +1,7 @@
 package com.postype.sns.application.usecase;
 
 import com.postype.sns.application.contoller.dto.FollowDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.member.service.FollowService;
 import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.domain.post.service.PostService;
@@ -20,10 +21,10 @@ public class PostUseCase {
 
 
 	//TODO :: 트랜잭션 걸지 않을 거임 팔로워 많을 경우 과부하
-	public Long execute(String title, String body, String memberId, int price){
-		Long postId = postService.create(title, body,  memberId, price);
+	public Long execute(String title, String body, MemberDto memberDto, int price){
+		Long postId = postService.create(title, body, memberDto, price);
 		List<Long> followedMemberIds = followService
-			.getFollowers(memberService.getMember(memberId))
+			.getFollowers(memberDto)
 			.stream()
 			.map(FollowDto::getFromMemberId)
 			.toList();

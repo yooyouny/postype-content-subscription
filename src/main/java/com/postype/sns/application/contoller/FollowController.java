@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,23 +29,17 @@ public class FollowController {
 	private final MemberService memberService;
 
 	@PostMapping("/{toMemberName}")
-	public Response<FollowResponse> create(Authentication authentication, @PathVariable String toMemberName){
-		MemberDto fromMember = getMemberDtoByPrincipal(String.valueOf(authentication.getPrincipal()));
+	public Response<FollowResponse> create(@AuthenticationPrincipal MemberDto fromMember, @PathVariable String toMemberName){
 		MemberDto toMember = memberService.getMember(toMemberName);
-		FollowDto dto = followService.create(fromMember.getId(), toMember.getMemberId());
+		FollowDto dto = followService.create(fromMember, toMember);
 		return Response.success(FollowResponse.fromFollowDto(dto));
 	}
 
 
 	//fromId가 팔로잉 하고 있는 목록 확인할 수 있음
 	@GetMapping
-	public Response<Page<FollowResponse>> getFollowList(Authentication authentication, Pageable pageable){
-		MemberDto fromMember = getMemberDtoByPrincipal(String.valueOf(authentication.getPrincipal()));
-		return Response.success(followService.getFollowList(fromMember, pageable).map(FollowResponse::fromFollowDto));
+	public Response<Page<FollowResponse>> getFollowList(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
+		return Response.success(followService.getFollowList(memberDto, pageable).map(FollowResponse::fromFollowDto));
 	}
 
-	private MemberDto getMemberDtoByPrincipal(String memberId){
-		return ClassUtils.getSafeCastInstance(memberId, MemberDto.class).orElseThrow(
-			() -> new ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to MemberDto is failed"));
-	}
 }

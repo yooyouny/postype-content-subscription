@@ -72,7 +72,7 @@ public class Post {
 		post.setId(dto.getId());
 		post.setTitle(dto.getTitle());
 		post.setBody(dto.getBody());
-		post.setMember(Member.of(dto.getMember()));
+		post.setMember(Member.toDto(dto.getMember()));
 		post.setPrice(new Point(dto.getPrice()));
 		post.setRegisteredAt(dto.getRegisteredAt());
 		post.setUpdatedAt(dto.getUpdatedAt());

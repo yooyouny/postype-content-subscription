@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.domain.post.model.Comment;
@@ -207,7 +208,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
 		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
 
-		Assertions.assertDoesNotThrow(() -> postService.getMyPostList("", pageable));
+		Assertions.assertDoesNotThrow(() -> postService.getMyPostList(MemberDto.fromEntity(member), pageable));
 	}
 
 	@Test
@@ -278,13 +279,14 @@ public class PostServiceTest {
 
 		//mocking
 		Post post = PostFixture.get(memberId, postId, 1L);
+		MemberDto memberDto = mock(MemberDto.class);
 		Member member = post.getMember();
 
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 		when(commentRepository.save(Comment.of(member, post, comment))).thenReturn(mock(Comment.class));
 
-		Assertions.assertDoesNotThrow(() -> postService.comment(postId, memberId, comment));
+		Assertions.assertDoesNotThrow(() -> postService.comment(postId, memberDto, comment));
 	}
 
 	@Test
