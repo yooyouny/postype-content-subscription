@@ -39,19 +39,16 @@ public class MemberController {
 		return Response.success(
 			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword(), request.getMemberName(), request.getEmail())));
 	}
-
 	@PostMapping("/login")
 	public Response<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
 		String token = memberService.login(request.getMemberId(), request.getPassword());
 		return Response.success(new MemberLoginResponse(token)); //dto <-> response 변환이 아닌 token값 반환
 	}
-
 	@GetMapping("/alarm")
 	public Response<Page<AlarmResponse>> getAlarm(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(memberService.getAlarmList(memberDto.getId(), pageable).map(
 			AlarmResponse::fromDto));
 	}
-
 	@GetMapping("/alarm/subscribe")
 	public SseEmitter subscribe(@AuthenticationPrincipal MemberDto memberDto){
 		return alarmService.connectAlarm(memberDto.getId());

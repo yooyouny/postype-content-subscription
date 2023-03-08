@@ -36,8 +36,6 @@ public class PostController {
 	private final PostService postService;
 	private final TimeLinePostsUseCase timeLinePostsUseCase;
 	private final PostUseCase createPostUseCase;
-
-
 	@PostMapping
 	public Response<Void> create(@RequestBody PostCreateRequest request, @AuthenticationPrincipal MemberDto memberDto){
 		createPostUseCase.execute(request.getTitle(), request.getBody(), memberDto, request.getPrice());
