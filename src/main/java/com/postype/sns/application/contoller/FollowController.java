@@ -35,7 +35,6 @@ public class FollowController {
 		return Response.success(FollowResponse.fromFollowDto(dto));
 	}
 
-
 	//fromId가 팔로잉 하고 있는 목록 확인할 수 있음
 	@GetMapping
 	public Response<Page<FollowResponse>> getFollowList(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){

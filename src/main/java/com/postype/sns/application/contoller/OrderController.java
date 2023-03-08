@@ -35,13 +35,11 @@ public class OrderController {
 		return Response.success(
 			OrderResponse.fromDto(OrderUseCase.create(memberDto, postId)));
 	}
-
 	@GetMapping("/{postId}")
 	public Response<OrderResponse> getOrderByMemberAndPost(@AuthenticationPrincipal MemberDto memberDto, @PathVariable Long postId){
 		return Response.success(
 			OrderResponse.fromDto(OrderUseCase.getOrderByMemberAndPost(memberDto, postId)));
 	}
-
 	@GetMapping
 	public Response<Page<OrderResponse>> getOrder(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(
